@@ -1,37 +1,46 @@
 package org.make.swift
 
-import java.time.ZonedDateTime
+import akka.actor.ActorSystem
+import akka.http.scaladsl.model.HttpResponse
+import akka.http.scaladsl.model.headers.{
+  ModeledCustomHeader,
+  ModeledCustomHeaderCompanion
+}
+import akka.stream.ActorMaterializer
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.util.{Success, Try}
 
 package object authentication {
+  implicit val system: ActorSystem = ActorSystem("swift-client")
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-  case class AuthenticationRequest(auth: AuthInfo)
-  case class AuthInfo(identity: AuthIdentity, scope: Option[AuthScope])
-  case class AuthIdentity(methods: Seq[String], password: AuthPassword)
-  case class AuthPassword(user: AuthUser)
-  case class AuthUser(name: String, domain: AuthDomain, password: String)
-  case class AuthDomain(id: String, name: Option[String] = None)
-  case class AuthScope(project: AuthProject)
-  case class AuthProject(name: String, domain: AuthDomain, id: Option[String])
+  final case class `X-Auth-Token`(override val value: String)
+      extends ModeledCustomHeader[`X-Auth-Token`] {
+    override def companion: ModeledCustomHeaderCompanion[`X-Auth-Token`] =
+      `X-Auth-Token`
+    override def renderInRequests: Boolean = true
+    override def renderInResponses: Boolean = true
+  }
 
-  case class AuthenticationResponse(token: AuthToken)
-  case class AuthToken(audit_ids: Seq[String],
-                       methods: Seq[String],
-                       roles: Seq[AuthRole],
-                       expires_at: ZonedDateTime,
-                       project: AuthProject,
-                       catalog: Seq[AuthCatalog],
-                       user: AuthUserInfo,
-                       issued_at: ZonedDateTime)
-  case class AuthRole(id: String, name: String)
-  case class AuthCatalog(endpoints: Seq[AuthEndpoint],
-                         `type`: String,
-                         id: String,
-                         name: String)
+  object `X-Auth-Token` extends ModeledCustomHeaderCompanion[`X-Auth-Token`] {
+    override val name: String = "X-Auth-Token"
+    override def parse(value: String): Try[`X-Auth-Token`] =
+      Success(new `X-Auth-Token`(value))
+  }
 
-  case class AuthEndpoint(url: String,
-                          region: String,
-                          interface: String,
-                          id: String)
-
-  case class AuthUserInfo(domain: AuthDomain, id: String, name: String)
+  implicit class RichHttpFuture(val self: Future[HttpResponse]) extends AnyVal {
+    def extractAuthenticationResponse: Future[AuthenticationResponse] = {
+      self
+        .map(response => response.headers.find(_.name() == `X-Auth-Token`.name))
+        .flatMap {
+          case Some(token) =>
+            Future.successful(AuthenticationResponse(token.value))
+          case _ =>
+            Future.failed(
+              new IllegalArgumentException(
+                "Unable to get a valid authentication"))
+        }
+    }
+  }
 }
