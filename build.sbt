@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-http" % "10.1.5",
   "io.circe" %% "circe-core" % "0.10.0",
   "io.circe" %% "circe-generic" % "0.10.0",
+  "io.circe" %% "circe-parser" % "0.10.0",
   "org.scalatest" %% "scalatest" % "3.0.5" % "test",
   "com.whisk" %% "docker-testkit-scalatest" % "0.9.6" % "test",
   "com.whisk" %% "docker-testkit-impl-docker-java" % "0.9.6" % "test",

@@ -1,15 +1,28 @@
 package org.make.swift.authentication
 
+import java.time.ZonedDateTime
+
 import scala.concurrent.Future
 
 trait Authenticator {
 
-  def authenticate(login: String,
-                   password: String,
-                   tenant: String): Future[AuthenticationResponse]
+  def authenticate(authenticationRequest: AuthenticationRequest)
+    : Future[AuthenticationResponse]
 }
 
-case class AuthenticationResponse(token: String)
+final case class AuthenticationRequest(
+    login: String,
+    password: String,
+    tenantName: String,
+    region: Option[String] = None
+)
+
+final case class AuthenticationResponse(tokenInfo: TokenInfo,
+                                        storageUrl: String)
+
+final case class TokenInfo(token: String,
+                           issuedAt: ZonedDateTime,
+                           expiresAt: ZonedDateTime)
 
 object Authenticator {
 

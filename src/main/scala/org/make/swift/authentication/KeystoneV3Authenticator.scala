@@ -6,9 +6,8 @@ import scala.concurrent.Future
 
 class KeystoneV3Authenticator(baseUrl: String) extends Authenticator {
 
-  override def authenticate(login: String,
-                            password: String,
-                            tenant: String): Future[AuthenticationResponse] =
+  override def authenticate(
+      request: AuthenticationRequest): Future[AuthenticationResponse] =
     ???
 }
 

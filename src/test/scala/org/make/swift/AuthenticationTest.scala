@@ -1,7 +1,8 @@
 package org.make.swift
 
-import org.make.swift.authentication.Authenticator
+import org.make.swift.authentication.{AuthenticationRequest, Authenticator}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
+
 import scala.concurrent.duration.DurationInt
 class AuthenticationTest extends BaseTest with DockerSwiftAllInOne {
 
@@ -20,10 +21,11 @@ class AuthenticationTest extends BaseTest with DockerSwiftAllInOne {
         Authenticator.newAuthenticator(Authenticator.KeystoneV1,
                                        s"http://localhost:$port/auth/v1.0")
 
-      whenReady(authenticator.authenticate("tester", "testing", "test"),
+      whenReady(authenticator.authenticate(
+                  AuthenticationRequest("tester", "testing", "test")),
                 Timeout(5.seconds)) { result =>
         println(result)
-        result.token.isEmpty should be(false)
+        result.tokenInfo.token.isEmpty should be(false)
       }
     }
 
@@ -32,9 +34,11 @@ class AuthenticationTest extends BaseTest with DockerSwiftAllInOne {
         Authenticator.newAuthenticator(Authenticator.KeystoneV1,
                                        s"http://localhost:$port/auth/v1.0")
 
-      whenReady(
-        authenticator.authenticate("tester", "bad-credentials", "test").failed,
-        Timeout(5.seconds)) { e =>
+      whenReady(authenticator
+                  .authenticate(
+                    AuthenticationRequest("tester", "bad-credentials", "test"))
+                  .failed,
+                Timeout(5.seconds)) { e =>
         println(e.getMessage)
       }
 
