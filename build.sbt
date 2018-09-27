@@ -13,6 +13,8 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-generic" % "0.10.0",
   "io.circe" %% "circe-parser" % "0.10.0",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
+  "com.typesafe" % "config" % "1.3.2",
+  // Test dependencies
   "org.slf4j" % "slf4j-simple" % "1.7.25" % "test",
   "org.scalatest" %% "scalatest" % "3.0.5" % "test",
   "com.whisk" %% "docker-testkit-scalatest" % "0.9.6" % "test",

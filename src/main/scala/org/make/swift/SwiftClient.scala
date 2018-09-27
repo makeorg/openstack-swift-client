@@ -11,9 +11,7 @@ trait SwiftClient {
   def listBuckets(): Future[Seq[Bucket]]
   def getBucket(name: String): Future[Option[Bucket]]
   def listFiles(bucket: Bucket): Future[Seq[Resource]]
-  def sendFile(bucket: Bucket,
-               path: String,
-               content: Array[Byte]): Future[Unit] = {
+  def sendFile(bucket: Bucket, path: String, content: Array[Byte]): Future[Unit] = {
     sendFile(bucket, path, new ByteArrayInputStream(content))
   }
   def sendFile(bucket: Bucket, path: String, content: InputStream): Future[Unit]

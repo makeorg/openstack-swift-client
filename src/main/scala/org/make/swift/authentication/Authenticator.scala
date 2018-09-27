@@ -6,23 +6,17 @@ import scala.concurrent.Future
 
 trait Authenticator {
 
-  def authenticate(authenticationRequest: AuthenticationRequest)
-    : Future[AuthenticationResponse]
+  def authenticate(authenticationRequest: AuthenticationRequest): Future[AuthenticationResponse]
 }
 
-final case class AuthenticationRequest(
-    login: String,
-    password: String,
-    tenantName: String,
-    region: Option[String] = None
-)
+final case class AuthenticationRequest(login: String,
+                                       password: String,
+                                       tenantName: String,
+                                       region: Option[String] = None)
 
-final case class AuthenticationResponse(tokenInfo: TokenInfo,
-                                        storageUrl: String)
+final case class AuthenticationResponse(tokenInfo: TokenInfo, storageUrl: String)
 
-final case class TokenInfo(token: String,
-                           issuedAt: ZonedDateTime,
-                           expiresAt: ZonedDateTime)
+final case class TokenInfo(token: String, issuedAt: ZonedDateTime, expiresAt: ZonedDateTime)
 
 object Authenticator {
 
