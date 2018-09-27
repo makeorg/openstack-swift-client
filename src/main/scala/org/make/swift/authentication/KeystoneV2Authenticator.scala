@@ -39,8 +39,6 @@ class KeystoneV2Authenticator(baseUrl: String) extends Authenticator {
         HttpEntity(ContentTypes.`application/json`, entity.asJson.toString)
     )
 
-    println(httpRequest)
-
     Http()
       .singleRequest(httpRequest)
       .flatMap(extractKeystoneV2Response(request, _))
@@ -51,7 +49,6 @@ class KeystoneV2Authenticator(baseUrl: String) extends Authenticator {
       response: HttpResponse): Future[AuthenticationResponse] = {
 
     if (response.status != StatusCodes.OK) {
-      println(response)
       Future.failed(
         new IllegalArgumentException(
           "Connexion failed, check your credentials"))

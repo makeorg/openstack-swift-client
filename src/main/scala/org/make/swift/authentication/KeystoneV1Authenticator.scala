@@ -7,12 +7,7 @@ import akka.http.scaladsl.model.headers.{
   ModeledCustomHeaderCompanion
 }
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes, Uri}
-import org.make.swift.authentication.KeystoneV1Authenticator.{
-  `X-Auth-Token-Expires`,
-  `X-Storage-Pass`,
-  `X-Storage-Url`,
-  `X-Storage-User`
-}
+import org.make.swift.authentication.KeystoneV1Authenticator._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.collection.immutable.Seq
@@ -33,10 +28,6 @@ class KeystoneV1Authenticator(baseUrl: String) extends Authenticator {
                 `X-Storage-Pass`(request.password))
         )
       )
-      .map { response =>
-        println(response)
-        response
-      }
       .flatMap(parseResponse)
 
   }
