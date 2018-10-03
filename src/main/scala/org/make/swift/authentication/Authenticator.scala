@@ -2,6 +2,8 @@ package org.make.swift.authentication
 
 import java.time.ZonedDateTime
 
+import akka.actor.ActorSystem
+
 import scala.concurrent.Future
 
 trait Authenticator {
@@ -24,12 +26,16 @@ object Authenticator {
   val KeystoneV2 = "keystone-V2"
   val KeystoneV3 = "keystone-V3"
 
-  def newAuthenticator(protocol: String, baseUrl: String): Authenticator =
-    protocols(protocol)(baseUrl)
+  def newAuthenticator(protocol: String, baseUrl: String)(implicit actorSystem: ActorSystem): Authenticator = {
+    protocol match {
+      case `KeystoneV1` => new KeystoneV1Authenticator(baseUrl)
+      case `KeystoneV2` => new KeystoneV2Authenticator(baseUrl)
+      case `KeystoneV3` => new KeystoneV3Authenticator(baseUrl)
+      case other =>
+        throw new IllegalArgumentException(
+          s"'$other' is not a valid authentication version, supported versions are '$KeystoneV1' and '$KeystoneV2'"
+        )
+    }
+  }
 
-  private val protocols: Map[String, String => Authenticator] = Map(
-    KeystoneV1 -> ((s: String) => new KeystoneV1Authenticator(s)),
-    KeystoneV2 -> ((s: String) => new KeystoneV2Authenticator(s)),
-    KeystoneV3 -> ((s: String) => new KeystoneV3Authenticator(s))
-  )
 }

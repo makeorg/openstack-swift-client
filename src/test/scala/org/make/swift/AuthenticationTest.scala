@@ -1,5 +1,6 @@
 package org.make.swift
 
+import akka.actor.ActorSystem
 import com.typesafe.scalalogging.StrictLogging
 import org.make.swift.authentication.{AuthenticationRequest, Authenticator}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
@@ -9,6 +10,7 @@ import scala.concurrent.duration.DurationInt
 class AuthenticationTest extends BaseTest with DockerSwiftAllInOne with StrictLogging {
 
   private val port = 12345
+  implicit val system: ActorSystem = ActorSystem("tests")
 
   override def externalPort: Option[Int] = Some(port)
 
@@ -49,5 +51,6 @@ class AuthenticationTest extends BaseTest with DockerSwiftAllInOne with StrictLo
   override protected def afterAll(): Unit = {
     super.afterAll()
     stopAllQuietly()
+    system.terminate()
   }
 }

@@ -1,27 +1,27 @@
 package org.make.swift.authentication
 
-import akka.http.scaladsl.Http
+import akka.actor.ActorSystem
 import akka.http.scaladsl.model.headers.{Date, ModeledCustomHeader, ModeledCustomHeaderCompanion}
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes, Uri}
 import org.make.swift.authentication.KeystoneV1Authenticator._
+import org.make.swift.util.HttpPool
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.collection.immutable.Seq
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Success, Try}
 
-class KeystoneV1Authenticator(baseUrl: String) extends Authenticator {
+class KeystoneV1Authenticator(baseUrl: String)(implicit actorSystem: ActorSystem)
+    extends HttpPool(baseUrl)
+    with Authenticator {
 
   override def authenticate(request: AuthenticationRequest): Future[AuthenticationResponse] = {
-
-    Http()
-      .singleRequest(
-        HttpRequest(
-          uri = Uri(baseUrl),
-          headers = Seq(`X-Storage-User`(s"${request.tenantName}:${request.login}"), `X-Storage-Pass`(request.password))
-        )
+    enqueue(
+      HttpRequest(
+        uri = Uri(baseUrl),
+        headers = Seq(`X-Storage-User`(s"${request.tenantName}:${request.login}"), `X-Storage-Pass`(request.password))
       )
-      .flatMap(parseResponse)
+    ).flatMap(parseResponse)
 
   }
 

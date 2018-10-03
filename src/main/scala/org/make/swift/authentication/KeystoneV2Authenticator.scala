@@ -2,25 +2,29 @@ package org.make.swift.authentication
 
 import java.time.ZonedDateTime
 
-import akka.http.scaladsl.Http
+import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.Accept
-import io.circe.{Decoder, Encoder}
+import akka.stream.ActorMaterializer
+import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.parser.parse
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import io.circe.generic.semiauto.deriveEncoder
-import io.circe.generic.semiauto.deriveDecoder
 import io.circe.syntax._
+import io.circe.{Decoder, Encoder}
 import org.make.swift.authentication.KeystoneV2Authenticator._
+import org.make.swift.util.HttpPool
 
 import scala.collection.immutable.Seq
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
 // OpenStack documentation has broken links on V2 documentation
 // See https://dev.cloudwatt.com/fr/doc/api/api-ref-identity-v2.html for more information if needed
-class KeystoneV2Authenticator(baseUrl: String) extends Authenticator {
+class KeystoneV2Authenticator(baseUrl: String)(implicit actorSystem: ActorSystem)
+    extends HttpPool(baseUrl)
+    with Authenticator {
+
+  implicit private val materializer: ActorMaterializer = ActorMaterializer()
 
   override def authenticate(request: AuthenticationRequest): Future[AuthenticationResponse] = {
 
@@ -38,8 +42,7 @@ class KeystoneV2Authenticator(baseUrl: String) extends Authenticator {
       entity = HttpEntity(ContentTypes.`application/json`, entity.asJson.toString)
     )
 
-    Http()
-      .singleRequest(httpRequest)
+    enqueue(httpRequest)
       .flatMap(extractKeystoneV2Response(request, _))
   }
 
