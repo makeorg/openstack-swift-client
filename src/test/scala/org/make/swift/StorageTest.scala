@@ -77,8 +77,6 @@ class StorageTest extends BaseTest with DockerSwiftAllInOne with StrictLogging {
         resources.isEmpty should be(true)
       }
 
-      Thread.sleep(10.seconds.toMillis)
-
       val bytes = """{"test": true}""".getBytes("UTF-8")
       whenReady(
         swiftClient

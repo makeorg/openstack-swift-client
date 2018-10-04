@@ -21,3 +21,5 @@ libraryDependencies ++= Seq(
   "com.whisk" %% "docker-testkit-impl-docker-java" % "0.9.6" % "test",
   "org.mockito" %% "mockito-scala" % "0.4.5" % "test"
 )
+
+Test / parallelExecution := false
