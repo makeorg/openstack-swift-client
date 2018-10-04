@@ -3,6 +3,7 @@ package org.make.swift
 import java.io.{ByteArrayOutputStream, File, FileInputStream, InputStream}
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.model.headers.{ModeledCustomHeader, ModeledCustomHeaderCompanion}
 import com.typesafe.config.Config
 import org.make.swift.authentication.AuthenticationActor.AuthenticationActorProps
 import org.make.swift.model.{Bucket, Resource}
@@ -10,6 +11,7 @@ import org.make.swift.storage.ActorBasedSwiftClient
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
+import scala.util.{Success, Try}
 
 trait SwiftClient {
 
@@ -59,4 +61,16 @@ object SwiftClient {
 
     new ActorBasedSwiftClient(actorSystem, props, initialBuckets)
   }
+
+  final case class `X-Auth-Token`(override val value: String) extends ModeledCustomHeader[`X-Auth-Token`] {
+    override def companion: ModeledCustomHeaderCompanion[`X-Auth-Token`] = `X-Auth-Token`
+    override def renderInRequests: Boolean = true
+    override def renderInResponses: Boolean = true
+  }
+
+  object `X-Auth-Token` extends ModeledCustomHeaderCompanion[`X-Auth-Token`] {
+    override val name: String = "X-Auth-Token"
+    override def parse(value: String): Try[`X-Auth-Token`] = Success(new `X-Auth-Token`(value))
+  }
+
 }

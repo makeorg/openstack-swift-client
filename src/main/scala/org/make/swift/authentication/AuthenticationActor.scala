@@ -3,25 +3,26 @@ package org.make.swift.authentication
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorRef, Props}
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
+import com.typesafe.scalalogging.StrictLogging
 import org.make.swift.authentication.AuthenticationActor._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Future, Promise}
 
-class AuthenticationActor(props: AuthenticationActorProps) extends Actor with ActorLogging {
+class AuthenticationActor(props: AuthenticationActorProps) extends Actor with StrictLogging {
 
   val authenticator: Authenticator = Authenticator.newAuthenticator(props.protocol, props.baseUrl)(context.system)
 
   var lastAuthenticationDate: Option[ZonedDateTime] = None
 
   override def preStart(): Unit = {
+    context.become(authenticating(Seq.empty))
     self ! Init
     context.system.scheduler.schedule(5.minutes, 5.minutes, self, CheckTokenValidity)
-
   }
 
   private def authenticate(): Unit = {
@@ -48,7 +49,7 @@ class AuthenticationActor(props: AuthenticationActorProps) extends Actor with Ac
       context.become(authenticated(result))
 
     case AuthenticationFailure(cause) =>
-      log.error(cause, "Unable to authenticate:")
+      logger.error("Unable to authenticate:", cause)
       context.system.scheduler.scheduleOnce(10.seconds, self, Init)
 
     case CheckTokenValidity =>
@@ -74,7 +75,7 @@ class AuthenticationActor(props: AuthenticationActorProps) extends Actor with Ac
         }
       }
     case AuthenticationFailure(cause) =>
-      log.error(cause, "Unable to authenticate:")
+      logger.error("Unable to authenticate:", cause)
       context.system.scheduler.scheduleOnce(10.seconds, self, CheckTokenValidity)
     case AuthenticationSuccess(result) =>
       context.become(authenticated(result))

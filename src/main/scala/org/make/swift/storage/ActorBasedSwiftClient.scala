@@ -6,6 +6,7 @@ import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import org.make.swift.SwiftClient
+import org.make.swift.SwiftClient.`X-Auth-Token`
 import org.make.swift.authentication.AuthenticationActor.AuthenticationActorProps
 import org.make.swift.authentication.{AuthenticationActor, AuthenticationActorService}
 import org.make.swift.model.{Bucket, Resource}
@@ -13,6 +14,7 @@ import org.make.swift.model.{Bucket, Resource}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
+import scala.collection.immutable
 
 class ActorBasedSwiftClient(actorSystem: ActorSystem,
                             authenticationProps: AuthenticationActorProps,
@@ -28,14 +30,19 @@ class ActorBasedSwiftClient(actorSystem: ActorSystem,
 
   private val authService = new AuthenticationActorService(actor)
 
-  // Timeout is low, since authenticator should reply right away
+  // Authenticator might not be ready
   implicit val timeout: Timeout = Timeout(3.seconds)
 
   override def listBuckets(): Future[Seq[Bucket]] = {
     authService
       .getStorageInformation()
       .flatMap { information =>
-        Http(actorSystem).singleRequest(HttpRequest(uri = s"${information.baseUrl}?format=json"))
+        Http(actorSystem).singleRequest(
+          HttpRequest(
+            uri = s"${information.baseUrl}?format=json",
+            headers = immutable.Seq(`X-Auth-Token`(information.token))
+          )
+        )
       }
       .decodeAs[Seq[Bucket]]
   }
@@ -44,7 +51,12 @@ class ActorBasedSwiftClient(actorSystem: ActorSystem,
     authService
       .getStorageInformation()
       .flatMap { information =>
-        Http(actorSystem).singleRequest(HttpRequest(uri = s"${information.baseUrl}?format=json"))
+        Http(actorSystem).singleRequest(
+          HttpRequest(
+            uri = s"${information.baseUrl}?format=json",
+            headers = immutable.Seq(`X-Auth-Token`(information.token))
+          )
+        )
       }
       .decodeAs[Seq[Bucket]]
       .map(_.find(_.name == name))
@@ -54,7 +66,12 @@ class ActorBasedSwiftClient(actorSystem: ActorSystem,
     authService
       .getStorageInformation()
       .flatMap { information =>
-        Http(actorSystem).singleRequest(HttpRequest(uri = s"${information.baseUrl}/${bucket.name}?format=json"))
+        Http(actorSystem).singleRequest(
+          HttpRequest(
+            uri = s"${information.baseUrl}/${bucket.name}?format=json",
+            headers = immutable.Seq(`X-Auth-Token`(information.token))
+          ),
+        )
       }
       .decodeAs[Seq[Resource]]
   }
@@ -70,7 +87,8 @@ class ActorBasedSwiftClient(actorSystem: ActorSystem,
               HttpRequest(
                 uri = s"${information.baseUrl}/${bucket.name}/$path",
                 method = HttpMethods.PUT,
-                entity = HttpEntity(parsedContentType, content)
+                entity = HttpEntity(parsedContentType, content),
+                headers = immutable.Seq(`X-Auth-Token`(information.token))
               )
             )
           }
@@ -90,7 +108,13 @@ class ActorBasedSwiftClient(actorSystem: ActorSystem,
     authService
       .getStorageInformation()
       .flatMap { information =>
-        Http(actorSystem).singleRequest(HttpRequest(uri = s"${information.baseUrl}/$name", method = HttpMethods.PUT))
+        Http(actorSystem).singleRequest(
+          HttpRequest(
+            uri = s"${information.baseUrl}/$name",
+            method = HttpMethods.PUT,
+            headers = immutable.Seq(`X-Auth-Token`(information.token))
+          )
+        )
       }
       .flatMap { response =>
         if (response.status.isSuccess()) {
