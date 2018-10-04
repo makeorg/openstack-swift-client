@@ -1,0 +1,19 @@
+image: makeorg/docker-sbt-coursier
+
+stages:
+  - coverage
+  - build
+
+coverage:
+  stage: coverage
+  tags:
+    - docker
+  script:
+    - sbt clean coverage test
+    - sbt coverageReport
+    - sbt codacyCoverage
+
+build:
+  stage: build
+  script:
+    - sbt package
