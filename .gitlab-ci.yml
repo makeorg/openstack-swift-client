@@ -39,5 +39,6 @@ release:
     - git remote set-url origin "${CI_PUSH_REPO}"
     - echo "publishTo := Some(\"Sonatype Nexus Repository Manager\" at \"https://$NEXUS_DOMAIN/repository/maven-releases\")" > /root/.sbt/1.0/publish.sbt
     - echo "credentials ++= Seq(Credentials(\"Sonatype Nexus Repository Manager\", \"$NEXUS_DOMAIN\", \"$NEXUS_USER\", \"$NEXUS_PASSWORD\"))" > /root/.sbt/1.0/credentials.sbt
+    - git checkout master
   script:
     - sbt clean "release release-version $RELEASE_VERSION next-version $RELEASE_NEXT_VERSION"
