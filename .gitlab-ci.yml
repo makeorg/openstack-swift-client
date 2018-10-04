@@ -25,7 +25,7 @@ release:
       - master
     variables:
       - $RELEASE_VERSION
-      - RELEASE_NEXT_VERSION
+      - $RELEASE_NEXT_VERSION
   before_script:
     - mkdir -p ~/.ssh/
     - chmod 700 ~/.ssh
@@ -40,4 +40,4 @@ release:
     - echo "publishTo := Some(\"Sonatype Nexus Repository Manager\" at \"https://$NEXUS_DOMAIN/repository/maven-releases\")"
     - echo "credentials ++= Seq(Credentials(\"Sonatype Nexus Repository Manager\", \"$NEXUS_DOMAIN\", \"$NEXUS_USER\", \"$NEXUS_PASSWORD\"))" > /root/.sbt/1.0/credentials.sbt
   script:
-    - sbt "clean test release release-version $RELEASE_VERSION next-version $RELEASE_NEXT_VERSION"
+    - sbt "clean release release-version $RELEASE_VERSION next-version $RELEASE_NEXT_VERSION"
