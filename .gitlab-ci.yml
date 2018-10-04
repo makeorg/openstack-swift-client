@@ -9,9 +9,7 @@ coverage:
   tags:
     - docker
   before_script:
-    - mkdir -p /var/lib/docker
-    - mount -t tmpfs -o size=12G tmpfs /var/lib/docker
-    - if [ ! -e /var/run/docker.sock ]; then DOCKER_DRIVER=overlay2 dockerd & fi
+    - if [ ! -e /var/run/docker.sock ]; then DOCKER_DRIVER=vfs dockerd & fi
     - until docker ps; do echo "waiting for docker to be up..."; sleep 0.5; done
     - docker pull bouncestorage/swift-aio
   script:
