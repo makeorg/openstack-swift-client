@@ -41,4 +41,4 @@ release:
     - echo "credentials ++= Seq(Credentials(\"Sonatype Nexus Repository Manager\", \"$NEXUS_DOMAIN\", \"$NEXUS_USER\", \"$NEXUS_PASSWORD\"))" > /root/.sbt/1.0/credentials.sbt
     - git checkout $CI_COMMIT_REF_NAME
   script:
-    - sbt clean "release release-version $RELEASE_VERSION next-version $RELEASE_NEXT_VERSION skip-tests"
+    - sbt clean "release release-version $RELEASE_VERSION next-version $RELEASE_NEXT_VERSION skip-tests with-defaults"
