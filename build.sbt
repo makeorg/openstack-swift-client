@@ -25,7 +25,6 @@ licenses := Seq("Apache 2.0" -> new URL("http://www.apache.org/licenses/LICENSE-
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.5.16",
   "com.typesafe.akka" %% "akka-stream" % "2.5.16",
-  "com.typesafe.akka" %% "akka-actor-typed" % "2.5.16",
   "com.typesafe.akka" %% "akka-http" % "10.1.5",
   "io.circe" %% "circe-core" % "0.10.0",
   "io.circe" %% "circe-generic" % "0.10.0",

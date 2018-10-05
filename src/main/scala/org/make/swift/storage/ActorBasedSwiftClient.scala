@@ -27,10 +27,10 @@ import org.make.swift.authentication.AuthenticationActor.AuthenticationActorProp
 import org.make.swift.authentication.{AuthenticationActor, AuthenticationActorService}
 import org.make.swift.model.{Bucket, Resource}
 
+import scala.collection.immutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
-import scala.collection.immutable
 
 class ActorBasedSwiftClient(actorSystem: ActorSystem,
                             authenticationProps: AuthenticationActorProps,
