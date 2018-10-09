@@ -30,6 +30,7 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
   "io.circe" %% "circe-parser" % circeVersion,
+  "io.circe" %% "circe-java8" % circeVersion,
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
   "com.typesafe" % "config" % "1.3.2",
   // Test dependencies

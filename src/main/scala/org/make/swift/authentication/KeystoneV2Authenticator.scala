@@ -26,6 +26,7 @@ import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.parser.parse
 import io.circe.syntax._
 import io.circe.{Decoder, Encoder}
+import io.circe.java8.time._
 import org.make.swift.authentication.KeystoneV2Authenticator._
 import org.make.swift.util.HttpPool
 
