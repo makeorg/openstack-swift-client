@@ -21,14 +21,15 @@ scalaVersion := "2.12.6"
 
 licenses := Seq("Apache 2.0" -> new URL("http://www.apache.org/licenses/LICENSE-2.0"))
 
+val circeVersion = "0.9.3"
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-actor" % "2.5.16",
-  "com.typesafe.akka" %% "akka-stream" % "2.5.16",
+  "com.typesafe.akka" %% "akka-actor" % "2.5.17",
+  "com.typesafe.akka" %% "akka-stream" % "2.5.17",
   "com.typesafe.akka" %% "akka-http" % "10.1.5",
-  "io.circe" %% "circe-core" % "0.10.0",
-  "io.circe" %% "circe-generic" % "0.10.0",
-  "io.circe" %% "circe-parser" % "0.10.0",
+  "io.circe" %% "circe-core" % circeVersion,
+  "io.circe" %% "circe-generic" % circeVersion,
+  "io.circe" %% "circe-parser" % circeVersion,
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
   "com.typesafe" % "config" % "1.3.2",
   // Test dependencies
