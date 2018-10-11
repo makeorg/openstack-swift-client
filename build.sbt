@@ -81,7 +81,7 @@ startYear := Some(2018)
 organizationHomepage := Some(url("https://make.org"))
 homepage := Some(url("https://gitlab.com/makeorg/platform/openstack-swift-client"))
 
-pomIncludeRepository := {repo => false}
+pomIncludeRepository := {_ => false}
 
 publishMavenStyle := true
 
@@ -93,13 +93,10 @@ pgpPassphrase := {
   val password: String = System.getenv("GPG_PASSWORD")
   password match {
     case null =>
-      streams.value.log.warn("GPG password not set")
       None
     case "" =>
-      streams.value.log.warn("GPG password not found")
       None
     case other =>
-      streams.value.log.info("GPG password received from env")
       Some(other.trim.toCharArray)
   }
 }
