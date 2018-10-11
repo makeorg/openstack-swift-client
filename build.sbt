@@ -91,9 +91,15 @@ releasePublishArtifactsAction := PgpKeys.publishSigned.value
 
 pgpPassphrase := {
   val password: String = System.getenv("GPG_PASSWORD")
-  if(Option(password).exists(_.nonEmpty)) {
-    Some(password.toCharArray)
-  } else {
-    None
+  password match {
+    case null =>
+      streams.value.log.warn("GPG password not set")
+      None
+    case "" =>
+      streams.value.log.warn("GPG password not found")
+      None
+    case other =>
+      streams.value.log.info("GPG password received from env")
+      Some(other.trim.toCharArray)
   }
 }
