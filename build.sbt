@@ -42,3 +42,58 @@ libraryDependencies ++= Seq(
 )
 
 Test / parallelExecution := false
+
+developers := List(
+  Developer(
+    id = "flaroche",
+    name = "François LAROCHE",
+    email = "fl@make.org",
+    url = url("https://github.com/larochef")
+  ),
+  Developer(
+    id = "cpestoury",
+    name = "Charley PESTOURY",
+    email = "cp@make.org",
+    url = url("https://gitlab.com/cpestoury")
+  ),
+  Developer(
+    id = "csalmon-legagneur",
+    name = "Colin SALMON-LEGAGNEUR",
+    email = "salmonl.colin@gmail.com",
+    url = url("https://gitlab.com/csalmon-")
+  ),
+  Developer(
+    id = "pda",
+    name = "Philippe de ARAUJO",
+    email = "pa@make.org",
+    url = url("https://gitlab.com/philippe.da")
+  )
+)
+
+scmInfo := Some(ScmInfo(
+  browseUrl = url("https://gitlab.com/makeorg/platform/openstack-swift-client"),
+  connection = "scm:git:git://gitlab.com:makeorg/platform/openstack-swift-client.git",
+  devConnection = Some("scm:git:ssh://gitlab.com:makeorg/platform/openstack-swift-client.git")))
+
+
+startYear := Some(2018)
+
+organizationHomepage := Some(url("https://make.org"))
+homepage := Some(url("https://gitlab.com/makeorg/platform/openstack-swift-client"))
+
+pomIncludeRepository := {repo => false}
+
+publishMavenStyle := true
+
+publishArtifact in Test := false
+
+releasePublishArtifactsAction := PgpKeys.publishSigned.value
+
+pgpPassphrase := {
+  val password: String = System.getenv("GPG_PASSWORD")
+  if(Option(password).exists(_.nonEmpty)) {
+    Some(password.toCharArray)
+  } else {
+    None
+  }
+}

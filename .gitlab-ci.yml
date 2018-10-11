@@ -26,6 +26,7 @@ release:
     variables:
       - $RELEASE_VERSION
       - $RELEASE_NEXT_VERSION
+      - $GPG_PASSWORD
   before_script:
     - mkdir -p ~/.ssh/
     - chmod 700 ~/.ssh
