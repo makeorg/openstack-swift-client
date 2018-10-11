@@ -100,3 +100,11 @@ pgpPassphrase := {
       Some(other.trim.toCharArray)
   }
 }
+
+publishTo := {
+  if(isSnapshot.value) {
+    Some("Sonatype Nexus Repository Manager" at "https://oss.sonatype.org/content/repositories/snapshots")
+  } else {
+    Some("Sonatype Nexus Repository Manager" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
+  }
+}
