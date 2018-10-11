@@ -43,8 +43,8 @@ release:
     - echo "publishTo := Some(\"Sonatype Nexus Repository Manager\" at \"https://oss.sonatype.org/service/local/staging/deploy/maven2\")" > /root/.sbt/1.0/publish.sbt
     - echo "credentials ++= Seq(Credentials(\"Sonatype Nexus Repository Manager\", \"oss.sonatype.org\", \"$SONATYPE_USER\", \"$SONATYPE_PASSWORD\"))" > /root/.sbt/1.0/credentials.sbt
     - mkdir -p /root/.sbt/gpg
-    - echo $SONATYPE_GPG_SECRET_KEY > /root/.sbt/secring.asc
-    - echo $SONATYPE_GPG_PUBLIC_KEY > /root/.sbt/pubring.asc
+    - echo $SONATYPE_GPG_SECRET_KEY > /root/.sbt/gpg/secring.asc
+    - echo $SONATYPE_GPG_PUBLIC_KEY > /root/.sbt/gpg/pubring.asc
     - git checkout $CI_COMMIT_REF_NAME
   script:
     - sbt clean "release release-version $RELEASE_VERSION next-version $RELEASE_NEXT_VERSION skip-tests with-defaults"
