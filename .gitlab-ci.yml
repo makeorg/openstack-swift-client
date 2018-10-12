@@ -26,7 +26,6 @@ release:
     variables:
       - $RELEASE_VERSION
       - $RELEASE_NEXT_VERSION
-      - $GPG_PASSWORD
       - $SONATYPE_USER
       - $SONATYPE_PASSWORD
   before_script:
