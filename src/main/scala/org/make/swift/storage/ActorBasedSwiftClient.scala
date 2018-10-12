@@ -143,9 +143,7 @@ class ActorBasedSwiftClient(actorSystem: ActorSystem,
 
   override def init(): Future[Unit] = {
     listBuckets().map { buckets =>
-      initialBuckets.filter { name =>
-        !buckets.exists(_.name == name)
-      }
+      initialBuckets.filter(name => !buckets.exists(_.name == name))
     }.flatMap { missingBuckets =>
       Future.traverse(missingBuckets)(createBucket)
     }.map(_ => ())

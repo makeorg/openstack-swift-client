@@ -29,19 +29,40 @@ import scala.util.{Failure, Success, Try}
 
 abstract class HttpPool(baseUrl: String)(implicit actorSystem: ActorSystem) {
 
+  private val defaultHttpsPort: Int = 443
+  private val defaultHttpPort: Int = 80
+  private val defaultBufferSize = 50
+
   lazy val pool: Flow[(HttpRequest, Promise[HttpResponse]),
                       (Try[HttpResponse], Promise[HttpResponse]),
                       Http.HostConnectionPool] = {
+
     val url = new URL(baseUrl)
     if (url.getProtocol.toLowerCase.contains("https")) {
-      Http(actorSystem).cachedHostConnectionPoolHttps[Promise[HttpResponse]](host = url.getHost, port = url.getPort)
+      val port = {
+        val urlPort = url.getPort
+        if (urlPort == -1) {
+          defaultHttpsPort
+        } else {
+          urlPort
+        }
+      }
+      Http(actorSystem).cachedHostConnectionPoolHttps[Promise[HttpResponse]](host = url.getHost, port = port)
     } else {
-      Http(actorSystem).cachedHostConnectionPool[Promise[HttpResponse]](host = url.getHost, port = url.getPort)
+      val port = {
+        val urlPort = url.getPort
+        if (urlPort == -1) {
+          defaultHttpPort
+        } else {
+          urlPort
+        }
+      }
+      Http(actorSystem).cachedHostConnectionPool[Promise[HttpResponse]](host = url.getHost, port = port)
     }
   }
 
   lazy val queue: SourceQueueWithComplete[(HttpRequest, Promise[HttpResponse])] = Source
-    .queue[(HttpRequest, Promise[HttpResponse])](bufferSize = 50, OverflowStrategy.backpressure)
+    .queue[(HttpRequest, Promise[HttpResponse])](bufferSize = defaultBufferSize, OverflowStrategy.backpressure)
     .via(pool)
     .withAttributes(ActorAttributes.dispatcher("make-openstack.dispatcher"))
     .toMat(Sink.foreach {

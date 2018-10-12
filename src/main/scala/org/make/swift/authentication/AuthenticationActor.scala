@@ -107,7 +107,7 @@ object AuthenticationActor {
                                       tenantName: String,
                                       region: Option[String])
 
-  def props(props: AuthenticationActorProps) = Props(new AuthenticationActor(props))
+  def props(props: AuthenticationActorProps): Props = Props(new AuthenticationActor(props))
 
   sealed trait AuthenticationActorProtocol
   case object Init extends AuthenticationActorProtocol
@@ -129,7 +129,7 @@ class AuthenticationActorService(reference: ActorRef) {
     (reference ? GetStorageInformation).flatMap {
       case info: StorageInformation             => Future.successful(info)
       case futureInfo: FutureStorageInformation => futureInfo.information
-      case _                                    => Future.failed(???)
+      case _                                    => Future.failed(new IllegalStateException("Unable to retrieve storage information"))
     }
   }
 }

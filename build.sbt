@@ -24,21 +24,21 @@ licenses := Seq("Apache 2.0" -> new URL("http://www.apache.org/licenses/LICENSE-
 val circeVersion = "0.9.3"
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-actor" % "2.5.17",
-  "com.typesafe.akka" %% "akka-stream" % "2.5.17",
-  "com.typesafe.akka" %% "akka-http" % "10.1.5",
-  "io.circe" %% "circe-core" % circeVersion,
-  "io.circe" %% "circe-generic" % circeVersion,
-  "io.circe" %% "circe-parser" % circeVersion,
-  "io.circe" %% "circe-java8" % circeVersion,
+  "com.typesafe.akka"          %% "akka-actor"    % "2.5.17",
+  "com.typesafe.akka"          %% "akka-stream"   % "2.5.17",
+  "com.typesafe.akka"          %% "akka-http"     % "10.1.5",
+  "io.circe"                   %% "circe-core"    % circeVersion,
+  "io.circe"                   %% "circe-generic" % circeVersion,
+  "io.circe"                   %% "circe-parser"  % circeVersion,
+  "io.circe"                   %% "circe-java8"   % circeVersion,
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
-  "com.typesafe" % "config" % "1.3.2",
+  "com.typesafe"               % "config"         % "1.3.2",
   // Test dependencies
-  "org.slf4j" % "slf4j-simple" % "1.7.25" % "test",
-  "org.scalatest" %% "scalatest" % "3.0.5" % "test",
-  "com.whisk" %% "docker-testkit-scalatest" % "0.9.6" % "test",
-  "com.whisk" %% "docker-testkit-impl-docker-java" % "0.9.6" % "test",
-  "org.mockito" %% "mockito-scala" % "0.4.5" % "test"
+  "org.slf4j"     % "slf4j-simple"                     % "1.7.25" % "test",
+  "org.scalatest" %% "scalatest"                       % "3.0.5"  % "test",
+  "com.whisk"     %% "docker-testkit-scalatest"        % "0.9.6"  % "test",
+  "com.whisk"     %% "docker-testkit-impl-docker-java" % "0.9.6"  % "test",
+  "org.mockito"   %% "mockito-scala"                   % "0.4.5"  % "test"
 )
 
 Test / parallelExecution := false
@@ -62,26 +62,25 @@ developers := List(
     email = "salmonl.colin@gmail.com",
     url = url("https://gitlab.com/csalmon-")
   ),
-  Developer(
-    id = "pda",
-    name = "Philippe de ARAUJO",
-    email = "pa@make.org",
-    url = url("https://gitlab.com/philippe.da")
-  )
+  Developer(id = "pda", name = "Philippe de ARAUJO", email = "pa@make.org", url = url("https://gitlab.com/philippe.da"))
 )
 
-scmInfo := Some(ScmInfo(
-  browseUrl = url("https://gitlab.com/makeorg/platform/openstack-swift-client"),
-  connection = "scm:git:git://gitlab.com:makeorg/platform/openstack-swift-client.git",
-  devConnection = Some("scm:git:ssh://gitlab.com:makeorg/platform/openstack-swift-client.git")))
-
+scmInfo := Some(
+  ScmInfo(
+    browseUrl = url("https://gitlab.com/makeorg/platform/openstack-swift-client"),
+    connection = "scm:git:git://gitlab.com:makeorg/platform/openstack-swift-client.git",
+    devConnection = Some("scm:git:ssh://gitlab.com:makeorg/platform/openstack-swift-client.git")
+  )
+)
 
 startYear := Some(2018)
 
 organizationHomepage := Some(url("https://make.org"))
 homepage := Some(url("https://gitlab.com/makeorg/platform/openstack-swift-client"))
 
-pomIncludeRepository := {_ => false}
+pomIncludeRepository := { _ =>
+  false
+}
 
 publishMavenStyle := true
 
@@ -102,9 +101,9 @@ pgpPassphrase := {
 }
 
 publishTo := {
-  if(isSnapshot.value) {
-    Some("Sonatype Nexus Repository Manager" at "https://oss.sonatype.org/content/repositories/snapshots")
+  if (isSnapshot.value) {
+    Some("releases".at("https://oss.sonatype.org/content/repositories/snapshots"))
   } else {
-    Some("Sonatype Nexus Repository Manager" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
+    Some("snapshots".at("https://oss.sonatype.org/service/local/staging/deploy/maven2"))
   }
 }

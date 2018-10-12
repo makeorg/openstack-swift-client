@@ -39,7 +39,8 @@ trait SwiftClient {
   def sendFile(bucket: Bucket, path: String, contentType: String, content: Array[Byte]): Future[Unit]
   def sendFile(bucket: Bucket, path: String, contentType: String, content: InputStream): Future[Unit] = {
     val out = new ByteArrayOutputStream()
-    val buffer = Array.ofDim[Byte](2048)
+    val bufferSize = 2048
+    val buffer = Array.ofDim[Byte](bufferSize)
     var readBytes: Int = -1
     while ({
       readBytes = content.read(buffer)
