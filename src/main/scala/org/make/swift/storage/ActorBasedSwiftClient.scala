@@ -22,7 +22,7 @@ import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import org.make.swift.SwiftClient
-import org.make.swift.SwiftClient.`X-Auth-Token`
+import org.make.swift.SwiftClient.{`X-Auth-Token`, `X-Object-Manifest`}
 import org.make.swift.authentication.AuthenticationActor.AuthenticationActorProps
 import org.make.swift.authentication.{AuthenticationActor, AuthenticationActorService}
 import org.make.swift.model.{Bucket, Resource}
@@ -35,7 +35,7 @@ import scala.concurrent.duration.DurationInt
 class ActorBasedSwiftClient(actorSystem: ActorSystem,
                             authenticationProps: AuthenticationActorProps,
                             initialBuckets: Seq[String])
-    extends SwiftClient {
+  extends SwiftClient {
 
   private val actor: ActorRef = {
     val props = AuthenticationActor.props(authenticationProps)
@@ -48,6 +48,23 @@ class ActorBasedSwiftClient(actorSystem: ActorSystem,
 
   // Authenticator might not be ready
   implicit val timeout: Timeout = Timeout(3.seconds)
+
+
+  override def getSwiftPath: Future[String] = {
+    authService.getStorageInformation().map(_.baseUrl)
+  }
+
+
+  override def downloadFile(bucket: Bucket, path: String): Future[HttpResponse] = {
+    authService.getStorageInformation().flatMap { information =>
+      Http(actorSystem).singleRequest(
+        HttpRequest(
+          uri = s"${information.baseUrl}/${bucket.name}/$path",
+          headers = immutable.Seq(`X-Auth-Token`(information.token))
+        )
+      )
+    }
+  }
 
   override def listBuckets(): Future[Seq[Bucket]] = {
     authService
@@ -118,6 +135,30 @@ class ActorBasedSwiftClient(actorSystem: ActorSystem,
             }
           }
     }
+  }
+
+
+  override def createDynamicLargeObjectManifest(bucket: Bucket, path: String, storagePath: String): Future[Unit] = {
+    authService
+      .getStorageInformation()
+      .flatMap { information =>
+        Http(actorSystem).singleRequest(
+          HttpRequest(
+            uri = s"${information.baseUrl}/${bucket.name}/$path",
+            method = HttpMethods.PUT,
+            headers = immutable.Seq(`X-Auth-Token`(information.token), `X-Object-Manifest`(s"${bucket.name}/$storagePath"))
+          )
+        )
+      }
+      .flatMap { response =>
+        if (response.status.isSuccess()) {
+          Future.successful {}
+        } else {
+          Future.failed(
+            new IllegalStateException(s"Creating DLO manifest failed with code ${response.status}: ${response.entity}")
+          )
+        }
+      }
   }
 
   override def createBucket(name: String): Future[Unit] = {
