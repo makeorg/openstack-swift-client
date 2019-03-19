@@ -19,6 +19,7 @@ package org.make.swift
 import java.io.{ByteArrayOutputStream, File, FileInputStream, InputStream}
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.headers.{ModeledCustomHeader, ModeledCustomHeaderCompanion}
 import com.typesafe.config.Config
 import org.make.swift.authentication.AuthenticationActor.AuthenticationActorProps
@@ -32,10 +33,13 @@ import scala.util.{Success, Try}
 trait SwiftClient {
 
   def init(): Future[Unit]
+  def getSwiftPath: Future[String]
+  def downloadFile(bucket: Bucket, path: String): Future[HttpResponse]
   def listBuckets(): Future[Seq[Bucket]]
   def createBucket(name: String): Future[Unit]
   def getBucket(name: String): Future[Option[Bucket]]
   def listFiles(bucket: Bucket): Future[Seq[Resource]]
+  def createDynamicLargeObjectManifest(bucket: Bucket, path: String, storagePath: String): Future[Unit]
   def sendFile(bucket: Bucket, path: String, contentType: String, content: Array[Byte]): Future[Unit]
   def sendFile(bucket: Bucket, path: String, contentType: String, content: InputStream): Future[Unit] = {
     val out = new ByteArrayOutputStream()
@@ -89,5 +93,19 @@ object SwiftClient {
     override val name: String = "X-Auth-Token"
     override def parse(value: String): Try[`X-Auth-Token`] = Success(new `X-Auth-Token`(value))
   }
+
+
+  final case class `X-Object-Manifest`(override val value: String) extends ModeledCustomHeader[`X-Object-Manifest`] {
+    override def companion: ModeledCustomHeaderCompanion[`X-Object-Manifest`] = `X-Object-Manifest`
+    override def renderInRequests: Boolean = true
+    override def renderInResponses: Boolean = true
+  }
+
+  object `X-Object-Manifest` extends ModeledCustomHeaderCompanion[`X-Object-Manifest`] {
+    override val name: String = "X-Object-Manifest"
+    override def parse(value: String): Try[`X-Object-Manifest`] = Success(new `X-Object-Manifest`(value))
+  }
+
+
 
 }

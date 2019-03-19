@@ -15,20 +15,23 @@
  */
 
 package org.make.swift
+
 import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.make.swift.model.Bucket
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 
-import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, Future}
 
 class StorageTest extends BaseTest with DockerSwiftAllInOne with StrictLogging {
 
   override def externalPort: Option[Int] = Some(StorageTest.port)
 
   implicit val system: ActorSystem = ActorSystem("tests", StorageTest.configuration)
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
   val swiftClient: SwiftClient = SwiftClient.create(system)
 
   override protected def beforeAll(): Unit = {
@@ -86,6 +89,15 @@ class StorageTest extends BaseTest with DockerSwiftAllInOne with StrictLogging {
         ()
       }
 
+      val getResource: Future[String] = swiftClient
+        .downloadFile(bucket, "test.json")
+        .flatMap(_.entity.toStrict(10.seconds))
+        .map(_.getData().decodeString("UTF-8"))
+
+      whenReady(getResource, Timeout(10.seconds)) { content =>
+        content should be("""{"test": true}""")
+      }
+
       whenReady(swiftClient.listFiles(bucket), Timeout(10.seconds)) { resources =>
         resources.isEmpty should be(false)
         val test = resources.find(_.name == "test.json")
@@ -110,6 +122,67 @@ class StorageTest extends BaseTest with DockerSwiftAllInOne with StrictLogging {
         test.exists(_.content_type == "application/json") should be(true)
       }
 
+    }
+
+    scenario("dynamic large objects") {
+      val bucketName = "dlo-bucket"
+      whenReady(swiftClient.createBucket(bucketName), Timeout(10.seconds)) { _ =>
+        ()
+      }
+      var maybeBucket: Option[Bucket] = None
+      whenReady(swiftClient.getBucket(bucketName), Timeout(10.seconds)) { result =>
+        maybeBucket = result
+      }
+
+      val bucket = maybeBucket.get
+
+      whenReady(swiftClient.listFiles(bucket), Timeout(10.seconds)) { resources =>
+        resources.isEmpty should be(true)
+      }
+
+      val bytes = """{"test1": true}""".getBytes("UTF-8")
+      whenReady(
+        swiftClient
+          .sendFile(bucket, "dlo/test1.json", "application/json", bytes),
+        Timeout(10.seconds)
+      ) { _ =>
+        ()
+      }
+
+      val bytes2 = """{"test2": true}""".getBytes("UTF-8")
+      whenReady(
+        swiftClient
+          .sendFile(bucket, "dlo/test2.json", "application/json", bytes2),
+        Timeout(10.seconds)
+      ) { _ =>
+        ()
+      }
+
+      val bytes3 = """{"test3": true}""".getBytes("UTF-8")
+      whenReady(
+        swiftClient
+          .sendFile(bucket, "dlo/test3.json", "application/json", bytes3),
+        Timeout(10.seconds)
+      ) { _ =>
+        ()
+      }
+
+      whenReady(
+        swiftClient
+          .createDynamicLargeObjectManifest(bucket, "dlo", "dlo/"),
+        Timeout(10.seconds)
+      ) { _ =>
+        ()
+      }
+
+      val getResource: Future[String] = swiftClient
+        .downloadFile(bucket, "dlo")
+        .flatMap(_.entity.toStrict(10.seconds))
+        .map(_.getData().decodeString("UTF-8"))
+
+      whenReady(getResource, Timeout(10.seconds)) { content =>
+        content should be("""{"test1": true}{"test2": true}{"test3": true}""")
+      }
     }
   }
 }
