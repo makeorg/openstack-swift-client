@@ -26,7 +26,6 @@ import org.make.swift.authentication.AuthenticationActor.AuthenticationActorProp
 import org.make.swift.model.{Bucket, Resource}
 import org.make.swift.storage.ActorBasedSwiftClient
 
-import scala.collection.JavaConverters._
 import scala.concurrent.Future
 import scala.util.{Success, Try}
 
@@ -78,7 +77,10 @@ object SwiftClient {
       tenantName = tenantName,
       region = region
     )
-    val initialBuckets: Seq[String] = configuration.getStringList("storage.init-containers").asScala
+    val initialBuckets: Seq[String] = {
+      val initContainers = configuration.getStringList("storage.init-containers")
+      initContainers.toArray(Array.ofDim[String](initContainers.size())).toSeq
+    }
 
     new ActorBasedSwiftClient(actorSystem, props, initialBuckets)
   }
@@ -94,7 +96,6 @@ object SwiftClient {
     override def parse(value: String): Try[`X-Auth-Token`] = Success(new `X-Auth-Token`(value))
   }
 
-
   final case class `X-Object-Manifest`(override val value: String) extends ModeledCustomHeader[`X-Object-Manifest`] {
     override def companion: ModeledCustomHeaderCompanion[`X-Object-Manifest`] = `X-Object-Manifest`
     override def renderInRequests: Boolean = true
@@ -105,7 +106,5 @@ object SwiftClient {
     override val name: String = "X-Object-Manifest"
     override def parse(value: String): Try[`X-Object-Manifest`] = Success(new `X-Object-Manifest`(value))
   }
-
-
 
 }

@@ -1,4 +1,7 @@
-image: makeorg/docker-sbt-coursier
+image: makeorg/docker-sbt
+
+variables:
+  SBT_OPTS: "-Xms1G -Xmx1G -XX:MaxMetaspaceSize=512M"
 
 stages:
   - coverage
@@ -13,9 +16,9 @@ coverage:
     - until docker ps; do echo "waiting for docker to be up..."; sleep 0.5; done
     - docker pull bouncestorage/swift-aio
   script:
-    - sbt clean coverage test
-    - sbt coverageReport
-    - sbt codacyCoverage
+    - sbt +clean +coverage +test
+    - sbt +coverageReport
+    - sbt +codacyCoverage
 
 
 release:
@@ -45,4 +48,4 @@ release:
     - echo "$SONATYPE_GPG_PUBLIC_KEY" > /root/.sbt/gpg/pubring.asc
     - git checkout $CI_COMMIT_REF_NAME
   script:
-    - sbt clean "release release-version $RELEASE_VERSION next-version $RELEASE_NEXT_VERSION skip-tests with-defaults"
+    - sbt clean "release cross release-version $RELEASE_VERSION next-version $RELEASE_NEXT_VERSION skip-tests with-defaults"
