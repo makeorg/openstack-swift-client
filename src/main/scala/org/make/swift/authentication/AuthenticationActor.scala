@@ -84,7 +84,7 @@ class AuthenticationActor(props: AuthenticationActorProps) extends Actor with St
       // Try to re-authenticate if token will expire in less than 10 minutes,
       // and leave some time between 2 authentication tries
       if (now.until(authentication.tokenInfo.expiresAt, ChronoUnit.MINUTES) <= 10) {
-        if (lastAuthenticationDate.exists(_.until(now, ChronoUnit.SECONDS) > 10)) {
+        if (lastAuthenticationDate.exists(_.until(now, ChronoUnit.SECONDS) < 10)) {
           context.system.scheduler.scheduleOnce(10.seconds, self, CheckTokenValidity)
         } else {
           authenticate()
