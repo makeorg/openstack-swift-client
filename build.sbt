@@ -21,27 +21,47 @@ scalaVersion := "2.12.6"
 
 licenses := Seq("Apache 2.0" -> new URL("http://www.apache.org/licenses/LICENSE-2.0"))
 
-val circeVersion = "0.9.3"
+crossScalaVersions := Seq("2.12.6", "2.13.0")
+
+val circeVersion = "0.12.1"
+
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka"          %% "akka-actor"    % "2.5.17",
-  "com.typesafe.akka"          %% "akka-stream"   % "2.5.17",
-  "com.typesafe.akka"          %% "akka-http"     % "10.1.5",
+  "com.typesafe.akka"          %% "akka-actor"    % "2.5.25",
+  "com.typesafe.akka"          %% "akka-stream"   % "2.5.25",
+  "com.typesafe.akka"          %% "akka-http"     % "10.1.9",
   "io.circe"                   %% "circe-core"    % circeVersion,
   "io.circe"                   %% "circe-generic" % circeVersion,
   "io.circe"                   %% "circe-parser"  % circeVersion,
-  "io.circe"                   %% "circe-java8"   % circeVersion,
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "com.typesafe"               % "config"         % "1.3.2",
   // Test dependencies
   "org.slf4j"     % "slf4j-simple"                     % "1.7.25" % "test",
-  "org.scalatest" %% "scalatest"                       % "3.0.5"  % "test",
-  "com.whisk"     %% "docker-testkit-scalatest"        % "0.9.6"  % "test",
-  "com.whisk"     %% "docker-testkit-impl-docker-java" % "0.9.6"  % "test",
-  "org.mockito"   %% "mockito-scala"                   % "0.4.5"  % "test"
+  "org.scalatest" %% "scalatest"                       % "3.0.8"  % "test",
+  "com.whisk"     %% "docker-testkit-scalatest"        % "0.9.9"  % "test",
+  "com.whisk"     %% "docker-testkit-impl-docker-java" % "0.9.9"  % "test",
+  "org.mockito"   %% "mockito-scala"                   % "1.5.17"  % "test"
 )
 
 Test / parallelExecution := false
+
+scalacOptions ++= Seq(
+  "-Yrangepos",
+  "-Xlint",
+  "-deprecation",
+  "-Xfatal-warnings",
+  "-feature",
+  "-encoding",
+  "UTF-8",
+  "-unchecked",
+  "-Ywarn-dead-code",
+  "-Ywarn-unused",
+  "-language:_",
+  "-Ycache-plugin-class-loader:last-modified",
+  "-Ycache-macro-class-loader:last-modified",
+  "-Ybackend-parallelism",
+  "5"
+)
 
 developers := List(
   Developer(

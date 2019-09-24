@@ -21,6 +21,9 @@ import com.github.dockerjava.jaxrs.JerseyDockerCmdExecFactory
 import com.whisk.docker.impl.dockerjava.{Docker, DockerJavaExecutorFactory}
 import com.whisk.docker.{DockerContainer, DockerFactory, DockerKit, DockerReadyChecker}
 
+import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration.DurationInt
+
 trait DockerSwiftAllInOne extends DockerKit {
 
   private val internalPort = 8080
@@ -31,6 +34,10 @@ trait DockerSwiftAllInOne extends DockerKit {
     DockerContainer(image = "bouncestorage/swift-aio", name = Some(getClass.getSimpleName))
       .withPorts(internalPort -> externalPort)
       .withReadyChecker(DockerReadyChecker.LogLineContains("supervisord started with pid"))
+
+
+  override val StartContainersTimeout: FiniteDuration = 5.minutes
+  override val StopContainersTimeout: FiniteDuration = 1.minute
 
   override def dockerContainers: List[DockerContainer] = swiftContainer :: super.dockerContainers
 
