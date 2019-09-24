@@ -42,6 +42,7 @@ release:
     - git config --global user.email "${GITLAB_USER_EMAIL}"
     - git config --global user.name "${GITLAB_USER_NAME}"
     - git remote set-url origin "${CI_PUSH_REPO}"
+    - mkdir -p /root/.sbt/1.0/
     - echo "credentials += Credentials(\"Sonatype Nexus Repository Manager\", \"oss.sonatype.org\", \"$SONATYPE_USER\", \"$SONATYPE_PASSWORD\")" > /root/.sbt/1.0/credentials.sbt
     - mkdir -p /root/.sbt/gpg
     - echo "$SONATYPE_GPG_SECRET_KEY" > /root/.sbt/gpg/secring.asc
