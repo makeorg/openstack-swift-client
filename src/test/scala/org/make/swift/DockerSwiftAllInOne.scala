@@ -37,6 +37,7 @@ trait DockerSwiftAllInOne extends DockerKit {
 
 
   override val StartContainersTimeout: FiniteDuration = 5.minutes
+  override val StopContainersTimeout: FiniteDuration = 1.minute
 
   override def dockerContainers: List[DockerContainer] = swiftContainer :: super.dockerContainers
 
