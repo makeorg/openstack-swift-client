@@ -33,5 +33,7 @@ release:
   before_script:
     - git fetch --tags
     - git checkout $CI_COMMIT_TAG
+    - export TRAVIS_TAG=$CI_COMMIT_TAG
+    - echo "releasing version $CI_COMMIT_TAG"
   script:
     - sbt ci-release

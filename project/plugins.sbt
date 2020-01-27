@@ -18,6 +18,6 @@ addSbtPlugin("com.geirsson"   % "sbt-scalafmt"           % "1.2.0")
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
 addSbtPlugin("org.scoverage"  % "sbt-scoverage"          % "1.6.1")
 addSbtPlugin("com.codacy"     % "sbt-codacy-coverage"    % "1.3.14")
-addSbtPlugin("com.geirsson"   % "sbt-ci-release"         % "1.4.31")
+addSbtPlugin("com.geirsson"   % "sbt-ci-release"         % "1.5.0")
 
 classpathTypes += "maven-plugin"
