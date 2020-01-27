@@ -34,6 +34,7 @@ release:
     - git fetch --tags
     - git checkout $CI_COMMIT_TAG
     - export TRAVIS_TAG=$CI_COMMIT_TAG
+    - export GPG_TTY=$(tty)
     - echo "releasing version $CI_COMMIT_TAG"
   script:
     - sbt ci-release
