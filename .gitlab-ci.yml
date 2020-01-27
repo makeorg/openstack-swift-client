@@ -30,5 +30,6 @@ release:
     - external_pull_requests
   before_script:
     - git fetch --tags
+    - git checkout $CI_COMMIT_REF_NAME
   script:
     - sbt ci-release
