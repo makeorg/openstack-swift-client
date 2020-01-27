@@ -17,7 +17,7 @@
 organization := "org.make"
 name := "openstack-swift-client"
 
-scalaVersion := "2.12.10"
+scalaVersion := "2.13.1"
 
 licenses := Seq("Apache 2.0" -> new URL("http://www.apache.org/licenses/LICENSE-2.0"))
 
@@ -97,32 +97,3 @@ startYear := Some(2018)
 
 organizationHomepage := Some(url("https://make.org"))
 homepage := Some(url("https://gitlab.com/makeorg/platform/openstack-swift-client"))
-
-pomIncludeRepository := { _ =>
-  false
-}
-
-publishMavenStyle := true
-
-publishArtifact in Test := false
-
-
-pgpPassphrase := {
-  val password: String = System.getenv("GPG_PASSWORD")
-  password match {
-    case null =>
-      None
-    case "" =>
-      None
-    case other =>
-      Some(other.trim.toCharArray)
-  }
-}
-
-publishTo := {
-  if (isSnapshot.value) {
-    Some("releases".at("https://oss.sonatype.org/content/repositories/snapshots"))
-  } else {
-    Some("snapshots".at("https://oss.sonatype.org/service/local/staging/deploy/maven2"))
-  }
-}
