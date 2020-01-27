@@ -24,29 +24,11 @@ coverage:
 release:
   stage: build
   only:
-    refs:
-      - master
-    variables:
-      - $RELEASE_VERSION
-      - $RELEASE_NEXT_VERSION
-      - $SONATYPE_USER
-      - $SONATYPE_PASSWORD
+    - tags
+  except:
+    - merge_requests
+    - external_pull_requests
   before_script:
-    - mkdir -p ~/.ssh/
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -t rsa gitlab.com > ~/.ssh/known_hosts
-    - echo "${DEPLOY_PRIVATE_KEY}" > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - export CI_PUSH_REPO=`echo $CI_REPOSITORY_URL | perl -pe 's#.*@(.+?(\:\d+)?)/#git@\1:#'`
-    - echo "Target repo is ${CI_PUSH_REPO}"
-    - git config --global user.email "${GITLAB_USER_EMAIL}"
-    - git config --global user.name "${GITLAB_USER_NAME}"
-    - git remote set-url origin "${CI_PUSH_REPO}"
-    - mkdir -p /root/.sbt/1.0/
-    - echo "credentials += Credentials(\"Sonatype Nexus Repository Manager\", \"oss.sonatype.org\", \"$SONATYPE_USER\", \"$SONATYPE_PASSWORD\")" > /root/.sbt/1.0/credentials.sbt
-    - mkdir -p /root/.sbt/gpg
-    - echo "$SONATYPE_GPG_SECRET_KEY" > /root/.sbt/gpg/secring.asc
-    - echo "$SONATYPE_GPG_PUBLIC_KEY" > /root/.sbt/gpg/pubring.asc
-    - git checkout $CI_COMMIT_REF_NAME
+    - git fetch --tags
   script:
-    - sbt clean "release cross release-version $RELEASE_VERSION next-version $RELEASE_NEXT_VERSION skip-tests with-defaults"
+    - sbt ci-release

@@ -106,7 +106,6 @@ publishMavenStyle := true
 
 publishArtifact in Test := false
 
-releasePublishArtifactsAction := PgpKeys.publishSigned.value
 
 pgpPassphrase := {
   val password: String = System.getenv("GPG_PASSWORD")

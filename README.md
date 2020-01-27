@@ -95,3 +95,6 @@ see [reference.conf](src/main/resources/reference.conf) for more information on 
 
 Note: Keystone V3 is not supported yet
 
+## Releasing
+
+To release a new version of the library, all you have to do is push a tag to the repository
