@@ -36,7 +36,5 @@ release:
     - export GPG_TTY=$(tty)
     - echo "releasing version $CI_COMMIT_TAG"
     - echo $PGP_SECRET |base64 -d |gpg --import --batch
-    - mkdir -p ~/.sbt
-    - echo "Global / gpgCommand := \"$PWD/gpg.sh\"" > ~/.sbt/gpg.sbt
   script:
     - sbt ci-release

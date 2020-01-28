@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.jsuereth.sbtpgp.PgpKeys._
 
 organization := "org.make"
 name := "openstack-swift-client"
@@ -97,3 +98,5 @@ startYear := Some(2018)
 
 organizationHomepage := Some(url("https://make.org"))
 homepage := Some(url("https://gitlab.com/makeorg/platform/openstack-swift-client"))
+
+gpgCommand := (baseDirectory.value / "gpg.sh").getAbsolutePath
