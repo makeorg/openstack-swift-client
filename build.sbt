@@ -99,4 +99,4 @@ startYear := Some(2018)
 organizationHomepage := Some(url("https://make.org"))
 homepage := Some(url("https://gitlab.com/makeorg/platform/openstack-swift-client"))
 
-gpgCommand := (baseDirectory.value / "gpg.sh").getAbsolutePath
+Global / gpgCommand := (baseDirectory.value / "gpg.sh").getAbsolutePath
