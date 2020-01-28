@@ -32,10 +32,8 @@ release:
     - external_pull_requests
   before_script:
     - git fetch --tags
-    - git checkout $CI_COMMIT_TAG
     - export TRAVIS_TAG=$CI_COMMIT_TAG
     - export GPG_TTY=$(tty)
     - echo "releasing version $CI_COMMIT_TAG"
-    - echo "$PGP_SECRET" |base64 --decode |gpg --import --batch
   script:
     - sbt ci-release
