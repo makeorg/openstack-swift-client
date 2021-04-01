@@ -22,26 +22,27 @@ scalaVersion := "2.13.1"
 
 licenses := Seq("Apache 2.0" -> new URL("http://www.apache.org/licenses/LICENSE-2.0"))
 
-crossScalaVersions := Seq("2.12.10", "2.13.1")
+crossScalaVersions := Seq("2.12.13", "2.13.5")
 
-val circeVersion = "0.12.1"
-
+val circeVersion = "0.13.0"
+val akkaVersion = "2.6.13"
+val dockerTestkitVersion = "0.9.9"
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka"          %% "akka-actor"    % "2.5.25",
-  "com.typesafe.akka"          %% "akka-stream"   % "2.5.25",
-  "com.typesafe.akka"          %% "akka-http"     % "10.1.9",
-  "io.circe"                   %% "circe-core"    % circeVersion,
-  "io.circe"                   %% "circe-generic" % circeVersion,
-  "io.circe"                   %% "circe-parser"  % circeVersion,
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-  "com.typesafe"               % "config"         % "1.3.2",
+  "com.typesafe.akka" %% "akka-actor-typed"  % akkaVersion,
+  "com.typesafe.akka" %% "akka-stream-typed" % akkaVersion,
+  "com.typesafe.akka" %% "akka-http"         % "10.2.4",
+  "io.circe"          %% "circe-core"        % circeVersion,
+  "io.circe"          %% "circe-generic"     % circeVersion,
+  "io.circe"          %% "circe-parser"      % circeVersion,
+  "com.typesafe"      % "config"             % "1.4.1",
   // Test dependencies
-  "org.slf4j"     % "slf4j-simple"                     % "1.7.25" % "test",
-  "org.scalatest" %% "scalatest"                       % "3.0.8"  % "test",
-  "com.whisk"     %% "docker-testkit-scalatest"        % "0.9.9"  % "test",
-  "com.whisk"     %% "docker-testkit-impl-docker-java" % "0.9.9"  % "test",
-  "org.mockito"   %% "mockito-scala"                   % "1.5.17"  % "test"
+  "org.slf4j"                  % "slf4j-simple"                     % "1.7.30"             % Test,
+  "com.typesafe.scala-logging" %% "scala-logging"                   % "3.9.3"              % Test,
+  "org.scalatest"              %% "scalatest"                       % "3.2.7"              % Test,
+  "com.whisk"                  %% "docker-testkit-scalatest"        % dockerTestkitVersion % Test,
+  "com.whisk"                  %% "docker-testkit-impl-docker-java" % dockerTestkitVersion % Test,
+  "org.mockito"                %% "mockito-scala"                   % "1.16.33"            % Test
 )
 
 Test / parallelExecution := false

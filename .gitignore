@@ -5,3 +5,4 @@ target
 .bloop
 /.vscode
 project/metals.sbt
+.bsp

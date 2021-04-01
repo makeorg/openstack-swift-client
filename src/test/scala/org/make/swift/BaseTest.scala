@@ -16,12 +16,14 @@
 
 package org.make.swift
 
+import org.mockito.MockitoSugar
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.featurespec.AnyFeatureSpec
+import org.scalatest.matchers.should.Matchers
 
 trait BaseTest
-    extends FeatureSpec
+    extends AnyFeatureSpec
     with GivenWhenThen
     with MockitoSugar
     with Matchers

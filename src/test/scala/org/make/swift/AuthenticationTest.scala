@@ -16,7 +16,8 @@
 
 package org.make.swift
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.scalalogging.StrictLogging
 import org.make.swift.authentication.{AuthenticationRequest, Authenticator}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
@@ -26,7 +27,7 @@ import scala.concurrent.duration.DurationInt
 class AuthenticationTest extends BaseTest with DockerSwiftAllInOne with StrictLogging {
 
   private val port = 12345
-  implicit val system: ActorSystem = ActorSystem("tests")
+  implicit val system: ActorSystem[_] = ActorSystem(Behaviors.empty, "tests")
 
   override def externalPort: Option[Int] = Some(port)
 
@@ -35,9 +36,9 @@ class AuthenticationTest extends BaseTest with DockerSwiftAllInOne with StrictLo
     startAllOrFail()
   }
 
-  feature("Swift all-in-one authentication") {
+  Feature("Swift all-in-one authentication") {
 
-    scenario("authenticate correctly") {
+    Scenario("authenticate correctly") {
       val authenticator =
         Authenticator.newAuthenticator(Authenticator.KeystoneV1, s"http://localhost:$port/auth/v1.0")
 
@@ -48,7 +49,7 @@ class AuthenticationTest extends BaseTest with DockerSwiftAllInOne with StrictLo
       }
     }
 
-    scenario("bad credentials") {
+    Scenario("bad credentials") {
       val authenticator =
         Authenticator.newAuthenticator(Authenticator.KeystoneV1, s"http://localhost:$port/auth/v1.0")
 
@@ -67,6 +68,7 @@ class AuthenticationTest extends BaseTest with DockerSwiftAllInOne with StrictLo
   override protected def afterAll(): Unit = {
     super.afterAll()
     stopAllQuietly()
+    close()
     system.terminate()
   }
 }

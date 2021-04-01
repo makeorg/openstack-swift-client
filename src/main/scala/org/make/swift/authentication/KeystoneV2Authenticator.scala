@@ -16,12 +16,11 @@
 
 package org.make.swift.authentication
 
-import java.time.ZonedDateTime
+import akka.actor.typed.ActorSystem
 
-import akka.actor.ActorSystem
+import java.time.ZonedDateTime
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.Accept
-import akka.stream.ActorMaterializer
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.parser.parse
 import io.circe.syntax._
@@ -36,19 +35,16 @@ import scala.concurrent.duration.DurationInt
 
 // OpenStack documentation has broken links on V2 documentation
 // See https://dev.cloudwatt.com/fr/doc/api/api-ref-identity-v2.html for more information if needed
-class KeystoneV2Authenticator(baseUrl: String)(implicit actorSystem: ActorSystem)
+class KeystoneV2Authenticator(baseUrl: String)(implicit actorSystem: ActorSystem[_])
     extends HttpPool(baseUrl)
     with Authenticator {
 
-  implicit private val materializer: ActorMaterializer = ActorMaterializer()
-
   override def authenticate(request: AuthenticationRequest): Future[AuthenticationResponse] = {
 
-    val entity = KeystoneV2AuthenticationRequest(
-      auth = KeystoneV2AuthenticationDetails(
-        tenantName = request.tenantName,
-        passwordCredentials = KeystoneV2Authentication(username = request.login, password = request.password)
-      )
+    val entity = KeystoneV2AuthenticationRequest(auth = KeystoneV2AuthenticationDetails(
+      tenantName = request.tenantName,
+      passwordCredentials = KeystoneV2Authentication(username = request.login, password = request.password)
+    )
     )
 
     val httpRequest = HttpRequest(
@@ -62,8 +58,10 @@ class KeystoneV2Authenticator(baseUrl: String)(implicit actorSystem: ActorSystem
       .flatMap(extractKeystoneV2Response(request, _))
   }
 
-  def extractKeystoneV2Response(request: AuthenticationRequest,
-                                response: HttpResponse): Future[AuthenticationResponse] = {
+  def extractKeystoneV2Response(
+    request: AuthenticationRequest,
+    response: HttpResponse
+  ): Future[AuthenticationResponse] = {
 
     if (response.status != StatusCodes.OK) {
       Future.failed(new IllegalArgumentException("Connexion failed, check your credentials"))
@@ -133,20 +131,24 @@ object KeystoneV2Authenticator {
     implicit val decoder: Decoder[KeystoneV2AuthenticationResponse] = deriveDecoder[KeystoneV2AuthenticationResponse]
   }
 
-  final case class KeystoneV2AccessInfo(token: KeystoneV2TokenInfo,
-                                        serviceCatalog: Seq[KeystoneV2Service],
-                                        user: KeystoneV2User,
-                                        metadata: KeystoneV2Metadata)
+  final case class KeystoneV2AccessInfo(
+    token: KeystoneV2TokenInfo,
+    serviceCatalog: Seq[KeystoneV2Service],
+    user: KeystoneV2User,
+    metadata: KeystoneV2Metadata
+  )
 
   object KeystoneV2AccessInfo {
     implicit val decoder: Decoder[KeystoneV2AccessInfo] = deriveDecoder[KeystoneV2AccessInfo]
   }
 
-  final case class KeystoneV2TokenInfo(issued_at: ZonedDateTime,
-                                       expires: ZonedDateTime,
-                                       id: String,
-                                       audit_ids: Seq[String],
-                                       tenant: KeystoneV2TenantInfo)
+  final case class KeystoneV2TokenInfo(
+    issued_at: ZonedDateTime,
+    expires: ZonedDateTime,
+    id: String,
+    audit_ids: Seq[String],
+    tenant: KeystoneV2TenantInfo
+  )
 
   object KeystoneV2TokenInfo {
     implicit val decoder: Decoder[KeystoneV2TokenInfo] = deriveDecoder[KeystoneV2TokenInfo]
@@ -158,30 +160,36 @@ object KeystoneV2Authenticator {
     implicit val decoder: Decoder[KeystoneV2TenantInfo] = deriveDecoder[KeystoneV2TenantInfo]
   }
 
-  final case class KeystoneV2Service(endpoints: Seq[KeystoneV2LocalizedService],
-                                     endpoints_links: Seq[String],
-                                     `type`: String,
-                                     name: String)
+  final case class KeystoneV2Service(
+    endpoints: Seq[KeystoneV2LocalizedService],
+    endpoints_links: Seq[String],
+    `type`: String,
+    name: String
+  )
 
   object KeystoneV2Service {
     implicit val decoder: Decoder[KeystoneV2Service] = deriveDecoder[KeystoneV2Service]
   }
 
-  final case class KeystoneV2LocalizedService(adminURL: String,
-                                              region: String,
-                                              internalURL: String,
-                                              publicURL: String,
-                                              id: String)
+  final case class KeystoneV2LocalizedService(
+    adminURL: String,
+    region: String,
+    internalURL: String,
+    publicURL: String,
+    id: String
+  )
 
   object KeystoneV2LocalizedService {
     implicit val decoder: Decoder[KeystoneV2LocalizedService] = deriveDecoder[KeystoneV2LocalizedService]
   }
 
-  final case class KeystoneV2User(username: String,
-                                  roles_links: Seq[String],
-                                  id: String,
-                                  name: String,
-                                  roles: Seq[KeystoneV2Role])
+  final case class KeystoneV2User(
+    username: String,
+    roles_links: Seq[String],
+    id: String,
+    name: String,
+    roles: Seq[KeystoneV2Role]
+  )
 
   object KeystoneV2User {
     implicit val decoder: Decoder[KeystoneV2User] = deriveDecoder[KeystoneV2User]

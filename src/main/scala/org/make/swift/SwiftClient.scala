@@ -16,9 +16,10 @@
 
 package org.make.swift
 
-import java.io.{ByteArrayOutputStream, File, FileInputStream, InputStream}
+import akka.actor.typed.ActorSystem
 
-import akka.actor.ActorSystem
+import java.io.{ByteArrayOutputStream, File, FileInputStream, InputStream}
+import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.headers.{ModeledCustomHeader, ModeledCustomHeaderCompanion}
 import com.typesafe.config.Config
@@ -60,7 +61,7 @@ trait SwiftClient {
 }
 
 object SwiftClient {
-  def create(actorSystem: ActorSystem = ActorSystem("make-openstack")): SwiftClient = {
+  def create(implicit actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "make-openstack")): SwiftClient = {
     val configuration: Config = actorSystem.settings.config.getConfig("make-openstack")
     val keystoneVersion = configuration.getString("authentication.keystone-version")
     val baseUrl = configuration.getString("authentication.base-url")
@@ -82,7 +83,7 @@ object SwiftClient {
       initContainers.toArray(Array.ofDim[String](initContainers.size())).toSeq
     }
 
-    new ActorBasedSwiftClient(actorSystem, props, initialBuckets)
+    new ActorBasedSwiftClient(props, initialBuckets)
   }
 
   final case class `X-Auth-Token`(override val value: String) extends ModeledCustomHeader[`X-Auth-Token`] {

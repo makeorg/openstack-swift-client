@@ -16,26 +16,28 @@
 
 package org.make.swift.util
 
-import java.net.URL
+import akka.actor.typed.ActorSystem
 
-import akka.actor.ActorSystem
+import java.net.URL
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
-import akka.stream.{ActorAttributes, ActorMaterializer, OverflowStrategy, QueueOfferResult}
+import akka.stream.{ActorAttributes, OverflowStrategy, QueueOfferResult}
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{Failure, Success, Try}
 
-abstract class HttpPool(baseUrl: String)(implicit actorSystem: ActorSystem) {
+abstract class HttpPool(baseUrl: String)(implicit actorSystem: ActorSystem[_]) {
 
   private val defaultHttpsPort: Int = 443
   private val defaultHttpPort: Int = 80
   private val defaultBufferSize = 50
 
-  lazy val pool: Flow[(HttpRequest, Promise[HttpResponse]),
-                      (Try[HttpResponse], Promise[HttpResponse]),
-                      Http.HostConnectionPool] = {
+  lazy val pool: Flow[
+    (HttpRequest, Promise[HttpResponse]),
+    (Try[HttpResponse], Promise[HttpResponse]),
+    Http.HostConnectionPool
+  ] = {
 
     val url = new URL(baseUrl)
     if (url.getProtocol.toLowerCase.contains("https")) {
@@ -69,7 +71,7 @@ abstract class HttpPool(baseUrl: String)(implicit actorSystem: ActorSystem) {
       case (Success(resp), p) => p.success(resp)
       case (Failure(e), p)    => p.failure(e)
     })(Keep.left)
-    .run()(ActorMaterializer()(actorSystem))
+    .run()
 
   def enqueue(request: HttpRequest)(implicit executionContext: ExecutionContext): Future[HttpResponse] = {
     val promise = Promise[HttpResponse]()

@@ -16,12 +16,11 @@
 
 package org.make.swift.authentication
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
 import org.make.swift.util.HttpPool
-import scala.concurrent.Future
-import akka.stream.ActorMaterializer
-import org.make.swift.authentication.KeystoneV3Authenticator.KeystoneV3AuthenticationMethod.Password
 
+import scala.concurrent.Future
+import org.make.swift.authentication.KeystoneV3Authenticator.KeystoneV3AuthenticationMethod.Password
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.parser.parse
 import io.circe.syntax._
@@ -35,17 +34,16 @@ import akka.http.scaladsl.model.ContentTypes
 import akka.http.scaladsl.model.Uri
 import org.make.swift.authentication.KeystoneV3Authenticator._
 import akka.http.scaladsl.model.HttpResponse
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import java.time.ZonedDateTime
 import scala.collection.immutable.Seq
 import scala.concurrent.duration.DurationInt
 import java.nio.charset.Charset
 
-class KeystoneV3Authenticator(baseUrl: String)(implicit actorSystem: ActorSystem)
+class KeystoneV3Authenticator(baseUrl: String)(implicit actorSystem: ActorSystem[_])
     extends HttpPool(baseUrl)
     with Authenticator {
-
-  implicit private val materializer: ActorMaterializer = ActorMaterializer()
 
   override def authenticate(authenticationRequest: AuthenticationRequest): Future[AuthenticationResponse] = {
     val entity = KeystoneV3Request(authenticationRequest)

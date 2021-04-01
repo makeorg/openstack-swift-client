@@ -16,14 +16,13 @@
 
 package org.make.swift.storage
 
-import akka.actor.{ActorRef, ActorSystem, ExtendedActorSystem}
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
-import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import org.make.swift.SwiftClient
 import org.make.swift.SwiftClient.{`X-Auth-Token`, `X-Object-Manifest`}
-import org.make.swift.authentication.AuthenticationActor.AuthenticationActorProps
+import org.make.swift.authentication.AuthenticationActor.{AuthenticationActorProps, AuthenticationActorProtocol}
 import org.make.swift.authentication.{AuthenticationActor, AuthenticationActorService}
 import org.make.swift.model.{Bucket, Resource}
 
@@ -32,28 +31,22 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
-class ActorBasedSwiftClient(actorSystem: ActorSystem,
-                            authenticationProps: AuthenticationActorProps,
-                            initialBuckets: Seq[String])
-  extends SwiftClient {
+class ActorBasedSwiftClient(authenticationProps: AuthenticationActorProps, initialBuckets: Seq[String])(
+  implicit actorSystem: ActorSystem[_]
+) extends SwiftClient {
 
-  private val actor: ActorRef = {
-    val props = AuthenticationActor.props(authenticationProps)
-    actorSystem.asInstanceOf[ExtendedActorSystem].systemActorOf(props, "swift-authenticator")
+  private val actor: ActorRef[AuthenticationActorProtocol] = {
+    actorSystem.systemActorOf(AuthenticationActor.createBehavior(authenticationProps), "swift-authenticator")
   }
-
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
   private val authService = new AuthenticationActorService(actor)
 
   // Authenticator might not be ready
   implicit val timeout: Timeout = Timeout(3.seconds)
 
-
   override def getSwiftPath: Future[String] = {
     authService.getStorageInformation().map(_.baseUrl)
   }
-
 
   override def downloadFile(bucket: Bucket, path: String): Future[HttpResponse] = {
     authService.getStorageInformation().flatMap { information =>
@@ -103,7 +96,7 @@ class ActorBasedSwiftClient(actorSystem: ActorSystem,
           HttpRequest(
             uri = s"${information.baseUrl}/${bucket.name}?format=json",
             headers = immutable.Seq(`X-Auth-Token`(information.token))
-          ),
+          )
         )
       }
       .decodeAs[Seq[Resource]]
@@ -137,7 +130,6 @@ class ActorBasedSwiftClient(actorSystem: ActorSystem,
     }
   }
 
-
   override def createDynamicLargeObjectManifest(bucket: Bucket, path: String, storagePath: String): Future[Unit] = {
     authService
       .getStorageInformation()
@@ -146,7 +138,8 @@ class ActorBasedSwiftClient(actorSystem: ActorSystem,
           HttpRequest(
             uri = s"${information.baseUrl}/${bucket.name}/$path",
             method = HttpMethods.PUT,
-            headers = immutable.Seq(`X-Auth-Token`(information.token), `X-Object-Manifest`(s"${bucket.name}/$storagePath"))
+            headers =
+              immutable.Seq(`X-Auth-Token`(information.token), `X-Object-Manifest`(s"${bucket.name}/$storagePath"))
           )
         )
       }

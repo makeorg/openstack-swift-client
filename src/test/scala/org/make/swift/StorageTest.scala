@@ -16,8 +16,8 @@
 
 package org.make.swift
 
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.make.swift.model.Bucket
@@ -30,8 +30,7 @@ class StorageTest extends BaseTest with DockerSwiftAllInOne with StrictLogging {
 
   override def externalPort: Option[Int] = Some(StorageTest.port)
 
-  implicit val system: ActorSystem = ActorSystem("tests", StorageTest.configuration)
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  implicit val system: ActorSystem[_] = ActorSystem[Nothing](Behaviors.empty, "tests", StorageTest.configuration)
   val swiftClient: SwiftClient = SwiftClient.create(system)
 
   override protected def beforeAll(): Unit = {
@@ -43,18 +42,19 @@ class StorageTest extends BaseTest with DockerSwiftAllInOne with StrictLogging {
   override protected def afterAll(): Unit = {
     super.afterAll()
     stopAllQuietly()
+    close()
     system.terminate()
   }
 
-  feature("buckets") {
-    scenario("initial buckets") {
+  Feature("buckets") {
+    Scenario("initial buckets") {
       whenReady(swiftClient.getBucket(StorageTest.initialContainer), Timeout(10.seconds)) { buckets =>
         buckets.isDefined should be(true)
         buckets.exists(_.name == StorageTest.initialContainer) should be(true)
       }
     }
 
-    scenario("create bucket") {
+    Scenario("create bucket") {
       whenReady(swiftClient.createBucket("first-bucket"), Timeout(10.seconds)) { _ =>
         ()
       }
@@ -65,7 +65,7 @@ class StorageTest extends BaseTest with DockerSwiftAllInOne with StrictLogging {
       }
     }
 
-    scenario("list-resources") {
+    Scenario("list-resources") {
       whenReady(swiftClient.createBucket("write-bucket"), Timeout(10.seconds)) { _ =>
         ()
       }
@@ -124,7 +124,7 @@ class StorageTest extends BaseTest with DockerSwiftAllInOne with StrictLogging {
 
     }
 
-    scenario("dynamic large objects") {
+    Scenario("dynamic large objects") {
       val bucketName = "dlo-bucket"
       whenReady(swiftClient.createBucket(bucketName), Timeout(10.seconds)) { _ =>
         ()

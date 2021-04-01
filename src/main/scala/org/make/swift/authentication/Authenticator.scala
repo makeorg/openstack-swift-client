@@ -16,10 +16,9 @@
 
 package org.make.swift.authentication
 
+import akka.actor.typed.ActorSystem
+
 import java.time.ZonedDateTime
-
-import akka.actor.ActorSystem
-
 import scala.concurrent.Future
 
 trait Authenticator {
@@ -27,10 +26,12 @@ trait Authenticator {
   def authenticate(authenticationRequest: AuthenticationRequest): Future[AuthenticationResponse]
 }
 
-final case class AuthenticationRequest(login: String,
-                                       password: String,
-                                       tenantName: String,
-                                       region: Option[String] = None)
+final case class AuthenticationRequest(
+  login: String,
+  password: String,
+  tenantName: String,
+  region: Option[String] = None
+)
 
 final case class AuthenticationResponse(tokenInfo: TokenInfo, storageUrl: String)
 
@@ -42,7 +43,7 @@ object Authenticator {
   val KeystoneV2 = "keystone-V2"
   val KeystoneV3 = "keystone-V3"
 
-  def newAuthenticator(protocol: String, baseUrl: String)(implicit actorSystem: ActorSystem): Authenticator = {
+  def newAuthenticator(protocol: String, baseUrl: String)(implicit actorSystem: ActorSystem[_]): Authenticator = {
     protocol match {
       case `KeystoneV1` => new KeystoneV1Authenticator(baseUrl)
       case `KeystoneV2` => new KeystoneV2Authenticator(baseUrl)

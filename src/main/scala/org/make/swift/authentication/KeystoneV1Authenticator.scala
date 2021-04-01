@@ -16,7 +16,7 @@
 
 package org.make.swift.authentication
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
 import akka.http.scaladsl.model.headers.{Date, ModeledCustomHeader, ModeledCustomHeaderCompanion}
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes, Uri}
 import org.make.swift.authentication.KeystoneV1Authenticator._
@@ -27,7 +27,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Success, Try}
 
-class KeystoneV1Authenticator(baseUrl: String)(implicit actorSystem: ActorSystem)
+class KeystoneV1Authenticator(baseUrl: String)(implicit actorSystem: ActorSystem[_])
     extends HttpPool(baseUrl)
     with Authenticator {
 
