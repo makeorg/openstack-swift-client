@@ -67,7 +67,7 @@ object AuthenticationActor {
           Behaviors.same
 
         case GetStorageInformation(replyTo) =>
-          val promise = Promise[StorageInformation]
+          val promise = Promise[StorageInformation]()
           replyTo ! FutureStorageInformation(promise.future)
           authenticating(lastAuthenticationDate, promises :+ promise)
       }

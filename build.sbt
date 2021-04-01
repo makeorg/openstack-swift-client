@@ -22,7 +22,7 @@ scalaVersion := "2.13.1"
 
 licenses := Seq("Apache 2.0" -> new URL("http://www.apache.org/licenses/LICENSE-2.0"))
 
-crossScalaVersions := Seq("2.12.13", "2.13.5")
+crossScalaVersions := Seq("2.12.12", "2.13.5")
 
 val circeVersion = "0.13.0"
 val akkaVersion = "2.6.13"
@@ -64,6 +64,14 @@ scalacOptions ++= Seq(
   "-Ybackend-parallelism",
   "5"
 )
+
+scalacOptions ++= {
+  if(scalaBinaryVersion.value == "2.12") {
+    Seq.empty
+  } else {
+    Seq("-Wconf:cat=lint-byname-implicit:s,cat=other-non-cooperative-equals:s,cat=w-flag-numeric-widen:s,any:e")
+  }
+}
 
 developers := List(
   Developer(
