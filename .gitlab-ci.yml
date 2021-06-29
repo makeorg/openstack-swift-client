@@ -18,10 +18,7 @@ coverage:
     - until docker ps; do echo "waiting for docker to be up..."; sleep 0.5; done
     - docker pull bouncestorage/swift-aio
   script:
-    - sbt +clean +coverage +test
-    - sbt +coverageReport
-    - sbt +codacyCoverage
-
+    - sbt +clean +test
 
 release:
   stage: build

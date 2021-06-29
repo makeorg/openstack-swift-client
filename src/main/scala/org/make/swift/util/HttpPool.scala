@@ -49,7 +49,7 @@ abstract class HttpPool(baseUrl: String)(implicit actorSystem: ActorSystem[_]) {
           urlPort
         }
       }
-      Http(actorSystem).cachedHostConnectionPoolHttps[Promise[HttpResponse]](host = url.getHost, port = port)
+      Http().cachedHostConnectionPoolHttps[Promise[HttpResponse]](host = url.getHost, port = port)
     } else {
       val port = {
         val urlPort = url.getPort
@@ -59,7 +59,7 @@ abstract class HttpPool(baseUrl: String)(implicit actorSystem: ActorSystem[_]) {
           urlPort
         }
       }
-      Http(actorSystem).cachedHostConnectionPool[Promise[HttpResponse]](host = url.getHost, port = port)
+      Http().cachedHostConnectionPool[Promise[HttpResponse]](host = url.getHost, port = port)
     }
   }
 
