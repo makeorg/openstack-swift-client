@@ -154,7 +154,7 @@ class AuthenticationActorService(reference: ActorRef[AuthenticationActorProtocol
     executionContext: ExecutionContext
   ): Future[StorageInformation] = {
     reference
-      .ask(GetStorageInformation)
+      .ask(GetStorageInformation.apply)
       .flatMap(_.information)
   }
 }

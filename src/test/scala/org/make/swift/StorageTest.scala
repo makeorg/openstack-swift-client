@@ -49,7 +49,7 @@ class StorageTest extends BaseTest with DockerSwiftAllInOne with StrictLogging {
   Feature("buckets") {
     Scenario("initial buckets") {
       whenReady(swiftClient.getBucket(StorageTest.initialContainer), Timeout(10.seconds)) { buckets =>
-        buckets.isDefined should be(true)
+        buckets should be(defined)
         buckets.exists(_.name == StorageTest.initialContainer) should be(true)
       }
     }

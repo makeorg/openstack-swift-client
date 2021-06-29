@@ -16,7 +16,6 @@
 
 package org.make.swift
 
-import org.mockito.MockitoSugar
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.featurespec.AnyFeatureSpec
@@ -25,7 +24,6 @@ import org.scalatest.matchers.should.Matchers
 trait BaseTest
     extends AnyFeatureSpec
     with GivenWhenThen
-    with MockitoSugar
     with Matchers
     with BeforeAndAfterAll
     with BeforeAndAfterEach

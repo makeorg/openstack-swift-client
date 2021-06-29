@@ -50,7 +50,7 @@ class ActorBasedSwiftClient(authenticationProps: AuthenticationActorProps, initi
 
   override def downloadFile(bucket: Bucket, path: String): Future[HttpResponse] = {
     authService.getStorageInformation().flatMap { information =>
-      Http(actorSystem).singleRequest(
+      Http().singleRequest(
         HttpRequest(
           uri = s"${information.baseUrl}/${bucket.name}/$path",
           headers = immutable.Seq(`X-Auth-Token`(information.token))
@@ -63,7 +63,7 @@ class ActorBasedSwiftClient(authenticationProps: AuthenticationActorProps, initi
     authService
       .getStorageInformation()
       .flatMap { information =>
-        Http(actorSystem).singleRequest(
+        Http().singleRequest(
           HttpRequest(
             uri = s"${information.baseUrl}?format=json",
             headers = immutable.Seq(`X-Auth-Token`(information.token))
@@ -77,7 +77,7 @@ class ActorBasedSwiftClient(authenticationProps: AuthenticationActorProps, initi
     authService
       .getStorageInformation()
       .flatMap { information =>
-        Http(actorSystem).singleRequest(
+        Http().singleRequest(
           HttpRequest(
             uri = s"${information.baseUrl}?format=json",
             headers = immutable.Seq(`X-Auth-Token`(information.token))
@@ -92,7 +92,7 @@ class ActorBasedSwiftClient(authenticationProps: AuthenticationActorProps, initi
     authService
       .getStorageInformation()
       .flatMap { information =>
-        Http(actorSystem).singleRequest(
+        Http().singleRequest(
           HttpRequest(
             uri = s"${information.baseUrl}/${bucket.name}?format=json",
             headers = immutable.Seq(`X-Auth-Token`(information.token))
@@ -109,7 +109,7 @@ class ActorBasedSwiftClient(authenticationProps: AuthenticationActorProps, initi
         authService
           .getStorageInformation()
           .flatMap { information =>
-            Http(actorSystem).singleRequest(
+            Http().singleRequest(
               HttpRequest(
                 uri = s"${information.baseUrl}/${bucket.name}/$path",
                 method = HttpMethods.PUT,
@@ -134,7 +134,7 @@ class ActorBasedSwiftClient(authenticationProps: AuthenticationActorProps, initi
     authService
       .getStorageInformation()
       .flatMap { information =>
-        Http(actorSystem).singleRequest(
+        Http().singleRequest(
           HttpRequest(
             uri = s"${information.baseUrl}/${bucket.name}/$path",
             method = HttpMethods.PUT,
@@ -158,7 +158,7 @@ class ActorBasedSwiftClient(authenticationProps: AuthenticationActorProps, initi
     authService
       .getStorageInformation()
       .flatMap { information =>
-        Http(actorSystem).singleRequest(
+        Http().singleRequest(
           HttpRequest(
             uri = s"${information.baseUrl}/$name",
             method = HttpMethods.PUT,

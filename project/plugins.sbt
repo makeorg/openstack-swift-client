@@ -16,8 +16,6 @@
 
 addSbtPlugin("org.scalameta"  % "sbt-scalafmt"           % "2.4.2")
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
-addSbtPlugin("org.scoverage"  % "sbt-scoverage"          % "1.6.1")
-addSbtPlugin("com.codacy"     % "sbt-codacy-coverage"    % "3.0.3")
 addSbtPlugin("com.geirsson"   % "sbt-ci-release"         % "1.5.6")
 
 classpathTypes += "maven-plugin"

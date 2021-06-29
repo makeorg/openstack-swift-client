@@ -45,7 +45,7 @@ class AuthenticationTest extends BaseTest with DockerSwiftAllInOne with StrictLo
       whenReady(authenticator.authenticate(AuthenticationRequest("tester", "testing", "test")), Timeout(5.seconds)) {
         result =>
           logger.info("{}", result)
-          result.tokenInfo.token.isEmpty should be(false)
+          result.tokenInfo.token.length should be >= (1)
       }
     }
 

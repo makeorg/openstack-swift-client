@@ -18,58 +18,53 @@ import com.jsuereth.sbtpgp.PgpKeys._
 organization := "org.make"
 name := "openstack-swift-client"
 
-scalaVersion := "2.13.1"
+val scala_212 = "2.12.12"
+val scala_213 = "2.13.5"
+val scala_3 = "3.0.0"
+
+scalaVersion := scala_213
 
 licenses := Seq("Apache 2.0" -> new URL("http://www.apache.org/licenses/LICENSE-2.0"))
 
-crossScalaVersions := Seq("2.12.12", "2.13.5")
+crossScalaVersions := Seq(scala_212, scala_213, scala_3)
 
-val circeVersion = "0.13.0"
-val akkaVersion = "2.6.13"
+val circeVersion = "0.14.1"
+val akkaVersion = "2.6.15"
 val dockerTestkitVersion = "0.9.9"
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-actor-typed"  % akkaVersion,
-  "com.typesafe.akka" %% "akka-stream-typed" % akkaVersion,
-  "com.typesafe.akka" %% "akka-http"         % "10.2.4",
+  ("com.typesafe.akka" %% "akka-actor-typed"  % akkaVersion).cross(CrossVersion.for3Use2_13),
+  ("com.typesafe.akka" %% "akka-stream-typed" % akkaVersion).cross(CrossVersion.for3Use2_13),
+  ("com.typesafe.akka" %% "akka-http"         % "10.2.4").cross(CrossVersion.for3Use2_13),
   "io.circe"          %% "circe-core"        % circeVersion,
   "io.circe"          %% "circe-generic"     % circeVersion,
   "io.circe"          %% "circe-parser"      % circeVersion,
   "com.typesafe"      % "config"             % "1.4.1",
   // Test dependencies
   "org.slf4j"                  % "slf4j-simple"                     % "1.7.30"             % Test,
-  "com.typesafe.scala-logging" %% "scala-logging"                   % "3.9.3"              % Test,
-  "org.scalatest"              %% "scalatest"                       % "3.2.7"              % Test,
-  "com.whisk"                  %% "docker-testkit-scalatest"        % dockerTestkitVersion % Test,
-  "com.whisk"                  %% "docker-testkit-impl-docker-java" % dockerTestkitVersion % Test,
-  "org.mockito"                %% "mockito-scala"                   % "1.16.33"            % Test
+  "com.typesafe.scala-logging" %% "scala-logging"                   % "3.9.4"              % Test,
+  "org.scalatest"              %% "scalatest"                       % "3.2.9"              % Test,
+  ("com.whisk"                  %% "docker-testkit-scalatest"        % dockerTestkitVersion % Test).cross(CrossVersion.for3Use2_13),
+  ("com.whisk"                  %% "docker-testkit-impl-docker-java" % dockerTestkitVersion % Test).cross(CrossVersion.for3Use2_13)
 )
 
 Test / parallelExecution := false
 
 scalacOptions ++= Seq(
-  "-Yrangepos",
-  "-Xlint",
   "-deprecation",
   "-Xfatal-warnings",
   "-feature",
   "-encoding",
   "UTF-8",
   "-unchecked",
-  "-Ywarn-dead-code",
-  "-Ywarn-unused",
   "-language:_",
-  "-Ycache-plugin-class-loader:last-modified",
-  "-Ycache-macro-class-loader:last-modified",
-  "-Ybackend-parallelism",
-  "5"
 )
 
 scalacOptions ++= {
-  if(scalaBinaryVersion.value == "2.12") {
-    Seq.empty
-  } else {
+  if(scalaBinaryVersion.value == "2.13") {
     Seq("-Wconf:cat=lint-byname-implicit:s,cat=other-non-cooperative-equals:s,cat=w-flag-numeric-widen:s,any:e")
+  } else {
+    Seq.empty
   }
 }
 
